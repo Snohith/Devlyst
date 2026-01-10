@@ -26,6 +26,8 @@ export function useCollaboration(roomId: string) {
 
         const wsUrl = process.env.NEXT_PUBLIC_WS_URL || defaultUrl;
 
+        console.log("[Devlyst] Connecting to WebSocket Server at:", wsUrl);
+
         const wsProvider = new WebsocketProvider(
             wsUrl,
             roomId,
