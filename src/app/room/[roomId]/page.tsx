@@ -299,8 +299,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                     </div>
                 </div>
             </div>
-        </div>
-        </main >
+        </main>
     );
 }
 

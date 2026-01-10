@@ -21,10 +21,18 @@ export default function Dashboard() {
 
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
-        if (joinRoomId.trim()) {
-            router.push(`/room/${joinRoomId.trim()}`);
+        const id = joinRoomId.trim();
+        // Allow ONLY 5 digit numbers
+        if (id.length === 5 && !isNaN(Number(id))) {
+            router.push(`/room/${id}`);
+        } else {
+            // Optional: visual feedback could be added here, but for now we rely on HTML5 validation
+            // or simply existing behavior
         }
     };
+
+    // Helper to generate 5 digit room ID
+    const generateRoomId = () => Math.floor(10000 + Math.random() * 90000).toString();
 
     return (
         <div className="min-h-screen bg-black text-white font-sans selection:bg-violet-500/30">
@@ -62,13 +70,13 @@ export default function Dashboard() {
                         </div>
                         <h2 className="text-xl font-bold mb-2">Create New Room</h2>
                         <p className="text-zinc-400 mb-6 text-sm">Start a fresh collaboration session instantly.</p>
-                        <Link
-                            href={`/room/${Math.random().toString(36).substring(7)}`}
-                            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors w-full sm:w-auto"
+                        <button
+                            onClick={() => router.push(`/room/${generateRoomId()}`)}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors w-full sm:w-auto cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
                             Create Room
-                        </Link>
+                        </button>
                     </div>
 
                     {/* Join Room Card */}
@@ -77,15 +85,21 @@ export default function Dashboard() {
                             <Hash className="w-6 h-6 text-pink-400" />
                         </div>
                         <h2 className="text-xl font-bold mb-2">Join Existing Room</h2>
-                        <p className="text-zinc-400 mb-6 text-sm">Enter a Room ID to jump into a session.</p>
+                        <p className="text-zinc-400 mb-6 text-sm">Enter a 5-digit Room ID to jump into a session.</p>
 
                         <form onSubmit={handleJoin} className="flex gap-2">
                             <input
                                 type="text"
-                                placeholder="Enter Room ID..."
+                                maxLength={5}
+                                pattern="\d{5}"
+                                placeholder="Enter 5-digit ID..."
                                 value={joinRoomId}
-                                onChange={(e) => setJoinRoomId(e.target.value)}
-                                className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                                onChange={(e) => {
+                                    // Only allow numbers
+                                    const val = e.target.value.replace(/\D/g, '');
+                                    if (val.length <= 5) setJoinRoomId(val);
+                                }}
+                                className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600 font-mono"
                             />
                             <button
                                 type="submit"
