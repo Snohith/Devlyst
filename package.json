@@ -1,6 +1,24 @@
 {
   "name": "devlyst-web",
   "version": "0.1.0",
+  "description": "A premium real-time collaborative coding environment with file management, terminal simulation, and a glassmorphic UI.",
+  "keywords": [
+    "collaborative-editor",
+    "real-time",
+    "yjs",
+    "monaco-editor",
+    "nextjs",
+    "react",
+    "websocket",
+    "glassmorphism",
+    "code-editor",
+    "pair-programming"
+  ],
+  "author": "Snohith",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Snohith/Devlyst.git"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
