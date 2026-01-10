@@ -42,10 +42,20 @@ export default function RoomPage({ params }: RoomPageProps) {
     const [language, setLanguage] = useState("javascript");
     const [currentFile, setCurrentFile] = useState("main.js");
 
+    // Identity
+    const [userName, setUserName] = useState("Anonymous");
+
     // Feature States
     const [followUserId, setFollowUserId] = useState<number | null>(null);
 
     const [showFileExplorer, setShowFileExplorer] = useState(false);
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const stored = localStorage.getItem("devlyst-username");
+            if (stored) setUserName(stored);
+        }
+    }, []);
 
     const handleEditorMount = (editor: any, monaco: any) => {
         editorInstanceRef.current = editor;
@@ -255,7 +265,13 @@ export default function RoomPage({ params }: RoomPageProps) {
                             </div>
 
                             <div className="flex items-center gap-2">
-
+                                <button
+                                    onClick={() => setSettingsOpen(true)}
+                                    className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+                                    title="User Settings"
+                                >
+                                    <Settings className="w-4 h-4" />
+                                </button>
                             </div>
                         </header>
 
@@ -272,6 +288,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                                         doc={doc}
                                         provider={provider}
                                         filename={currentFile}
+                                        userName={userName}
                                     />
                                 )}
                             </div>
@@ -288,6 +305,16 @@ export default function RoomPage({ params }: RoomPageProps) {
                     </div>
                 </div>
             </div>
+
+            <UserSettings
+                isOpen={isSettingsOpen}
+                onClose={() => setSettingsOpen(false)}
+                currentName={userName}
+                onSave={(newName) => {
+                    setUserName(newName);
+                    localStorage.setItem("devlyst-username", newName);
+                }}
+            />
         </main>
     );
 }

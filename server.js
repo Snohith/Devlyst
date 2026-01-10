@@ -59,7 +59,7 @@ const interval = setInterval(() => {
         ws.isAlive = false;
         ws.ping();
     });
-}, 30000);
+}, 15000); // Ping every 15 seconds to detect disconnects faster
 
 wss.on('close', () => {
     clearInterval(interval);

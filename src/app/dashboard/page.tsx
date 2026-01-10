@@ -1,13 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, ArrowRight, Hash } from "lucide-react";
+import { Plus, ArrowRight, Hash, Settings } from "lucide-react";
+import UserSettings from "@/components/UserSettings";
 
 export default function Dashboard() {
     const router = useRouter();
     const [joinRoomId, setJoinRoomId] = useState("");
+    const [isSettingsOpen, setSettingsOpen] = useState(false);
+    const [userName, setUserName] = useState("Anonymous");
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const stored = localStorage.getItem("devlyst-username");
+            if (stored) setUserName(stored);
+        }
+    }, []);
 
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,6 +35,14 @@ export default function Dashboard() {
                         <img src="/logo.svg" alt="Devlyst" className="w-8 h-8" />
                         <span className="font-bold text-lg tracking-tight">Devlyst</span>
                     </Link>
+
+                    <button
+                        onClick={() => setSettingsOpen(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-sm font-medium"
+                    >
+                        <Settings className="w-4 h-4" />
+                        <span>Settings</span>
+                    </button>
                 </div>
             </header>
 
@@ -32,7 +50,7 @@ export default function Dashboard() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <div>
                         <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
-                        <p className="text-zinc-400">Welcome to Devlyst</p>
+                        <p className="text-zinc-400">Welcome back, <span className="text-white font-medium">{userName}</span></p>
                     </div>
                 </div>
 
@@ -80,6 +98,16 @@ export default function Dashboard() {
                     </div>
                 </div>
             </main>
+
+            <UserSettings
+                isOpen={isSettingsOpen}
+                onClose={() => setSettingsOpen(false)}
+                currentName={userName}
+                onSave={(newName) => {
+                    setUserName(newName);
+                    localStorage.setItem("devlyst-username", newName);
+                }}
+            />
         </div>
     );
 }

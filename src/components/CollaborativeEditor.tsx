@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import Editor, { OnMount } from "@monaco-editor/react";
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
@@ -26,6 +26,7 @@ interface CollaborativeEditorProps {
     doc: Y.Doc | null;
     provider: WebsocketProvider | null;
     filename: string;
+    userName: string;
 }
 
 export default function CollaborativeEditor({
@@ -39,18 +40,21 @@ export default function CollaborativeEditor({
     followUserId = null,
     doc,
     provider,
-    filename
+    filename,
+    userName
 }: CollaborativeEditorProps) {
     const [editorRef, setEditorRef] = useState<any>(null);
     const [monacoRef, setMonacoRef] = useState<any>(null);
-    // const [binding, setBinding] = useState<MonacoBinding | null>(null); // Replaced by useRef
     const [yMap, setYMap] = useState<Y.Map<any> | null>(null);
 
-    // Stable User Identity
+    // Stable User Identity (Color persists, name updates)
+    // We use a ref for color so it doesn't change when name changes
+    const userColor = useRef(USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]);
+
     const user = useMemo(() => ({
-        name: `User ${Math.floor(Math.random() * 1000)}`,
-        color: USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]
-    }), []);
+        name: userName,
+        color: userColor.current
+    }), [userName]);
 
     const handleEditorDidMount: OnMount = (editor, monaco) => {
         setEditorRef(editor);
