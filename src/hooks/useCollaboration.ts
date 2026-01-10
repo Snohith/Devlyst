@@ -18,9 +18,12 @@ export function useCollaboration(roomId: string) {
 
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 
-        // If NEXT_PUBLIC_WS_HOST is set (e.g. devlyst-ws.onrender.com), use it.
-        // Otherwise, fallback to current hostname (localhost or devlyst-web.onrender.com)
-        const hostname = process.env.NEXT_PUBLIC_WS_HOST || window.location.hostname;
+        // If NEXT_PUBLIC_WS_HOST is set to the internal Render service name "devlyst-ws",
+        // automatically append .onrender.com for client-side access.
+        let hostname = process.env.NEXT_PUBLIC_WS_HOST || window.location.hostname;
+        if (hostname === "devlyst-ws") {
+            hostname = "devlyst-ws.onrender.com";
+        }
         const port = process.env.NEXT_PUBLIC_WS_PORT;
 
         // If port is present and NON-standard, append it. 
