@@ -1,0 +1,85 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Plus, ArrowRight, Hash } from "lucide-react";
+
+export default function Dashboard() {
+    const router = useRouter();
+    const [joinRoomId, setJoinRoomId] = useState("");
+
+    const handleJoin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (joinRoomId.trim()) {
+            router.push(`/room/${joinRoomId.trim()}`);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-black text-white font-sans selection:bg-violet-500/30">
+            {/* Header */}
+            <header className="border-b border-white/10 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
+                <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+                    <Link href="/" className="flex items-center gap-2">
+                        <img src="/logo.svg" alt="Devlyst" className="w-8 h-8" />
+                        <span className="font-bold text-lg tracking-tight">Devlyst</span>
+                    </Link>
+                </div>
+            </header>
+
+            <main className="max-w-6xl mx-auto px-6 py-12">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                    <div>
+                        <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
+                        <p className="text-zinc-400">Welcome to Devlyst</p>
+                    </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                    {/* Create Room Card */}
+                    <div className="p-8 border border-white/10 rounded-2xl bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors group">
+                        <div className="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <Plus className="w-6 h-6 text-violet-400" />
+                        </div>
+                        <h2 className="text-xl font-bold mb-2">Create New Room</h2>
+                        <p className="text-zinc-400 mb-6 text-sm">Start a fresh collaboration session instantly.</p>
+                        <Link
+                            href={`/room/${Math.random().toString(36).substring(7)}`}
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors w-full sm:w-auto"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Create Room
+                        </Link>
+                    </div>
+
+                    {/* Join Room Card */}
+                    <div className="p-8 border border-white/10 rounded-2xl bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors">
+                        <div className="w-12 h-12 bg-pink-500/10 rounded-xl flex items-center justify-center mb-6">
+                            <Hash className="w-6 h-6 text-pink-400" />
+                        </div>
+                        <h2 className="text-xl font-bold mb-2">Join Existing Room</h2>
+                        <p className="text-zinc-400 mb-6 text-sm">Enter a Room ID to jump into a session.</p>
+
+                        <form onSubmit={handleJoin} className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Enter Room ID..."
+                                value={joinRoomId}
+                                onChange={(e) => setJoinRoomId(e.target.value)}
+                                className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600"
+                            />
+                            <button
+                                type="submit"
+                                disabled={!joinRoomId.trim()}
+                                className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <ArrowRight className="w-5 h-5" />
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    );
+}

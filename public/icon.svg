@@ -1,0 +1,8 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Solid Black Background for visibility on all tab colors -->
+  <rect x="0" y="0" width="100" height="100" rx="20" fill="black" />
+  
+  <!-- Geometric D Shape (scaled down slightly to fit inside) -->
+  <path d="M30 20 H50 L80 50 L50 80 H30 V20 Z" stroke="white" stroke-width="8" stroke-linejoin="round" transform="scale(0.8) translate(12, 12)" />
+  <path d="M45 35 L60 50 L45 65" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" transform="scale(0.8) translate(12, 12)" />
+</svg>
