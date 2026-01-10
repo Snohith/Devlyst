@@ -156,8 +156,29 @@ export default function CollaborativeEditor({
     // File Binding Logic (Critical for Memory Leaks)
     const bindingRef = React.useRef<MonacoBinding | null>(null);
 
+    // Wait for provider sync to avoid overwriting existing files
+    const [isSynced, setIsSynced] = useState(false);
+
     useEffect(() => {
-        if (!editorRef || !provider || !doc || !filename) return;
+        if (!provider) return;
+
+        // Check if already synced
+        if (provider.shouldConnect && provider.wsconnected && provider.synced) {
+            setIsSynced(true);
+        }
+
+        const onSync = (isSynced: boolean) => {
+            setIsSynced(isSynced);
+        };
+
+        provider.on('synced', onSync);
+        return () => {
+            provider.off('synced', onSync);
+        };
+    }, [provider]);
+
+    useEffect(() => {
+        if (!editorRef || !provider || !doc || !filename || !isSynced) return;
 
         // Cleanup previous binding immediately to avoid overlap
         if (bindingRef.current) {
@@ -167,9 +188,12 @@ export default function CollaborativeEditor({
 
         const filesMap = doc.getMap("files");
 
-        // Ensure the file exists in the map
+        // ONLY create the file if it truly doesn't exist after sync
         if (!filesMap.has(filename)) {
-            filesMap.set(filename, new Y.Text());
+            const newFile = new Y.Text();
+            // Start with default content comment
+            newFile.insert(0, defaultValue || "");
+            filesMap.set(filename, newFile);
         }
 
         // Always get the instance FROM the map to ensure it's the shared type
@@ -185,13 +209,16 @@ export default function CollaborativeEditor({
 
         bindingRef.current = newBinding;
 
+        // Force layout
+        editorRef.layout();
+
         return () => {
             if (bindingRef.current) {
                 bindingRef.current.destroy();
                 bindingRef.current = null;
             }
         };
-    }, [editorRef, provider, doc, filename]);
+    }, [editorRef, provider, doc, filename, isSynced, defaultValue]);
 
     return (
         <div className={cn("relative w-full h-full flex flex-col", className)}>
