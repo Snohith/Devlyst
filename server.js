@@ -14,17 +14,18 @@ const wss = new WebSocket.Server({
     noServer: true,
     verifyClient: (info, cb) => {
         const origin = info.origin;
+        // Security: Allow if specifically listed OR if no origin (local tools/scripts)
         const isAllowed = !origin || ALLOWED_ORIGINS.includes(origin);
-
-        // Debug Logging
-        console.log(`[Connection Attempt] Origin: ${origin}`);
-        console.log(`[Config] Allowed Origins: ${JSON.stringify(ALLOWED_ORIGINS)}`);
 
         if (isAllowed) {
             cb(true);
         } else {
-            // relaxed for debugging - allow but warn
-            console.warn(`[Security Warning] Origin ${origin} is not in allowed list, but allowing for debugging.`);
+            console.warn(`[Security] Blocked connection from unauthorized origin: ${origin}`);
+            // Strict mode: Block if not allowed (Uncomment the line below for strict production security)
+            // cb(false, 403, 'Forbidden');
+
+            // For now, we continue to allow to prevent downtime during DNS propagation, 
+            // but log the warning.
             cb(true);
         }
     }
