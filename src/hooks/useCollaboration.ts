@@ -18,10 +18,13 @@ export function useCollaboration(roomId: string) {
 
         const protocol = window.location.protocol === "https:" ? "wss" : "ws";
         const hostname = process.env.NEXT_PUBLIC_WS_HOST || window.location.hostname;
-        const port = process.env.NEXT_PUBLIC_WS_PORT || "1234"; // Default dev port
+        const port = process.env.NEXT_PUBLIC_WS_PORT;
 
-        // Construct URL: If explicit URL provided in env, use it, else build from parts
-        const wsUrl = process.env.NEXT_PUBLIC_WS_URL || `${protocol}://${hostname}:${port}`;
+        // If port is missing or standard 443/80, dont append it for cleaner URLs (though usually harmless)
+        const portSuffix = (port && port !== "443" && port !== "80") ? `:${port}` : "";
+        const defaultUrl = `${protocol}://${hostname}${portSuffix}`;
+
+        const wsUrl = process.env.NEXT_PUBLIC_WS_URL || defaultUrl;
 
         const wsProvider = new WebsocketProvider(
             wsUrl,

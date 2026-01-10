@@ -6,8 +6,9 @@ const http = require('http');
 const ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    process.env.NEXT_PUBLIC_APP_URL // Support env var for production
-].filter(Boolean); // Remove undefined/null if env var is missing
+    process.env.NEXT_PUBLIC_APP_URL,
+    process.env.ALLOWED_ORIGIN_HOST ? `https://${process.env.ALLOWED_ORIGIN_HOST}` : null
+].filter(Boolean);
 
 const wss = new WebSocket.Server({
     noServer: true,
