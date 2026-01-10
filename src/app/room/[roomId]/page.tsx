@@ -265,13 +265,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setSettingsOpen(true)}
-                                    className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"
-                                    title="User Settings"
-                                >
-                                    <Settings className="w-4 h-4" />
-                                </button>
+                                {/* Settings moved to Dashboard */}
                             </div>
                         </header>
 
@@ -305,17 +299,8 @@ export default function RoomPage({ params }: RoomPageProps) {
                     </div>
                 </div>
             </div>
-
-            <UserSettings
-                isOpen={isSettingsOpen}
-                onClose={() => setSettingsOpen(false)}
-                currentName={userName}
-                onSave={(newName) => {
-                    setUserName(newName);
-                    localStorage.setItem("devlyst-username", newName);
-                }}
-            />
-        </main>
+        </div>
+        </main >
     );
 }
 
