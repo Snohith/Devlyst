@@ -177,10 +177,13 @@ export default function CollaborativeEditor({
         };
     }, [provider]);
 
+    // We use a state to force re-binding if the remote yText instance changes
+    const [bindingVersion, setBindingVersion] = useState(0);
+
     useEffect(() => {
         if (!editorRef || !provider || !doc || !filename || !isSynced) return;
 
-        // Cleanup previous binding immediately to avoid overlap
+        // Cleanup previous binding immediately
         if (bindingRef.current) {
             bindingRef.current.destroy();
             bindingRef.current = null;
@@ -188,17 +191,17 @@ export default function CollaborativeEditor({
 
         const filesMap = doc.getMap("files");
 
-        // ONLY create the file if it truly doesn't exist after sync
+        // 1. Ensure file exists (Atomic check-and-set pattern preferred, but Yjs handles LWW)
         if (!filesMap.has(filename)) {
             const newFile = new Y.Text();
-            // Start with default content comment
             newFile.insert(0, defaultValue || "");
             filesMap.set(filename, newFile);
         }
 
-        // Always get the instance FROM the map to ensure it's the shared type
+        // 2. Get the current shared type
         const yText = filesMap.get(filename) as Y.Text;
 
+        // 3. Create Binding
         // @ts-ignore
         const newBinding = new MonacoBinding(
             yText,
@@ -206,19 +209,29 @@ export default function CollaborativeEditor({
             new Set([editorRef]),
             provider.awareness
         );
-
         bindingRef.current = newBinding;
-
-        // Force layout
         editorRef.layout();
 
+        // 4. Critical: Listen for external replacements of this file
+        const handleMapChange = () => {
+            const currentYText = filesMap.get(filename) as Y.Text;
+            // If the object reference changed (someone else replaced the file), we must re-bind
+            if (currentYText !== yText) {
+                console.log("[Devlyst] File replaced remotely, re-binding...");
+                setBindingVersion(v => v + 1);
+            }
+        };
+
+        filesMap.observe(handleMapChange);
+
         return () => {
+            filesMap.unobserve(handleMapChange);
             if (bindingRef.current) {
                 bindingRef.current.destroy();
                 bindingRef.current = null;
             }
         };
-    }, [editorRef, provider, doc, filename, isSynced, defaultValue]);
+    }, [editorRef, provider, doc, filename, isSynced, bindingVersion, defaultValue]);
 
     return (
         <div className={cn("relative w-full h-full flex flex-col", className)}>
