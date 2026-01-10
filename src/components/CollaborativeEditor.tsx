@@ -162,12 +162,14 @@ export default function CollaborativeEditor({
         }
 
         const filesMap = doc.getMap("files");
-        let yText = filesMap.get(filename) as Y.Text;
 
-        if (!yText) {
-            yText = new Y.Text();
-            filesMap.set(filename, yText);
+        // Ensure the file exists in the map
+        if (!filesMap.has(filename)) {
+            filesMap.set(filename, new Y.Text());
         }
+
+        // Always get the instance FROM the map to ensure it's the shared type
+        const yText = filesMap.get(filename) as Y.Text;
 
         // @ts-ignore
         const newBinding = new MonacoBinding(
