@@ -2,8 +2,7 @@
 
 **Devlyst** is a premium, real-time collaborative coding environment built for speed, aesthetics, and synchronization. It combines the power of the Monaco Editor with instant WebSocket-based collaboration.
 
-![Devlyst Preview](public/logo.svg) 
-*(Note: Replace with an actual screenshot is recommended)*
+![Devlyst Preview](public/logo.svg)
 
 ## 🚀 Key Features
 
