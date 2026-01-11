@@ -8,6 +8,7 @@ import ExecutionPanel from "@/components/ExecutionPanel";
 
 import UserList from "@/components/UserList";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeSelector } from "@/components/ThemeSelector";
 import FileExplorer from "@/components/FileExplorer";
 import { cn } from "@/lib/utils";
 import { useCollaboration } from "@/hooks/useCollaboration";
@@ -40,6 +41,7 @@ export default function RoomPage({ params }: RoomPageProps) {
     const [users, setUsers] = useState<any[]>([]);
     const [copied, setCopied] = useState(false);
     const [language, setLanguage] = useState("javascript");
+    const [theme, setTheme] = useState("vs-dark");
     const [currentFile, setCurrentFile] = useState("main.js");
 
     // Identity
@@ -205,6 +207,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <ThemeSelector currentTheme={theme} onThemeChange={setTheme} />
                     <LanguageSelector value={language} onChange={handleLanguageChange} />
 
                     <UserList
@@ -278,6 +281,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                                         onAwarenessChange={setUsers}
                                         language={language}
                                         onLanguageChange={setLanguage}
+                                        theme={theme}
                                         followUserId={followUserId}
                                         doc={doc}
                                         provider={provider}

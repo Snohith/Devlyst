@@ -22,6 +22,7 @@ interface CollaborativeEditorProps {
     onAwarenessChange?: (users: any[]) => void;
     language?: string;
     onLanguageChange?: (lang: string) => void;
+    theme?: string;
     followUserId?: number | null;
     doc: Y.Doc | null;
     provider: WebsocketProvider | null;
@@ -37,6 +38,7 @@ export default function CollaborativeEditor({
     onAwarenessChange,
     onLanguageChange,
     language = "javascript",
+    theme = "vs-dark",
     followUserId = null,
     doc,
     provider,
@@ -46,6 +48,13 @@ export default function CollaborativeEditor({
     const [editorRef, setEditorRef] = useState<any>(null);
     const [monacoRef, setMonacoRef] = useState<any>(null);
     const [yMap, setYMap] = useState<Y.Map<any> | null>(null);
+
+    // Apply Theme Changes
+    useEffect(() => {
+        if (monacoRef && theme) {
+            monacoRef.editor.setTheme(theme);
+        }
+    }, [theme, monacoRef]);
 
     // Stable User Identity (Color persists, name updates)
     // We use a ref for color so it doesn't change when name changes
