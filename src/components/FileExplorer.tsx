@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import * as Y from "yjs";
-import { FilePlus, File, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { FilePlus, File, Trash2, CheckCircle, XCircle, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 interface FileExplorerProps {
     doc: Y.Doc | null;
@@ -19,6 +21,7 @@ export default function FileExplorer({ doc, provider, currentFile, onFileSelect,
     const [newFileName, setNewFileName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
     const [deletingFile, setDeletingFile] = useState<string | null>(null);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     useEffect(() => {
         if (!doc) return;
@@ -86,6 +89,29 @@ export default function FileExplorer({ doc, provider, currentFile, onFileSelect,
         setDeletingFile(null);
     };
 
+    const handleDownload = async () => {
+        if (!doc) return;
+        setIsDownloading(true);
+        try {
+            const zip = new JSZip();
+            const filesMap = doc.getMap("files");
+
+            filesMap.forEach((content, filename) => {
+                if (content instanceof Y.Text) {
+                    zip.file(filename as string, content.toString());
+                }
+            });
+
+            const blob = await zip.generateAsync({ type: "blob" });
+            saveAs(blob, "devlyst-project.zip");
+        } catch (err) {
+            console.error("Failed to download project:", err);
+            alert("Failed to download project files.");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     return (
         <>
             {/* Mobile Overlay */}
@@ -103,9 +129,19 @@ export default function FileExplorer({ doc, provider, currentFile, onFileSelect,
             )}>
                 <div className="p-4 flex items-center justify-between text-xs font-semibold text-zinc-500 uppercase tracking-widest border-b border-white/5 bg-white/5">
                     <span>Explorer ({files.length})</span>
-                    <button onClick={() => setIsCreating(true)} className="hover:text-white transition-colors">
-                        <FilePlus className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={handleDownload}
+                            disabled={isDownloading}
+                            className="hover:text-white transition-colors p-1 disabled:opacity-50"
+                            title="Download Project (ZIP)"
+                        >
+                            <Download className={cn("w-4 h-4", isDownloading && "animate-bounce")} />
+                        </button>
+                        <button onClick={() => setIsCreating(true)} className="hover:text-white transition-colors p-1" title="New File">
+                            <FilePlus className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">

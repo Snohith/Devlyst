@@ -19,15 +19,23 @@ export const metadata: Metadata = {
     template: "%s | Devlyst"
   },
   description: "Experience the future of pair programming with Devlyst. Real-time collaboration, AI assistance, and instant execution in a premium secure environment.",
-  keywords: ["code editor", "collaboration", "pair programming", "online ide", "typescript", "react"],
+  keywords: ["code editor", "collaboration", "pair programming", "online ide", "typescript", "react", "yjs", "monaco"],
   authors: [{ name: "Devlyst Team" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://devlyst.com",
+    url: "https://devlyst-web.onrender.com",
     title: "Devlyst | Real-time Collaborative Code Editor",
     description: "Code together, instantly. Features real-time sync, AI copilot, and multi-language execution.",
     siteName: "Devlyst",
+    images: [
+      {
+        url: "/logo.svg", // Fallback to logo until a proper OG image is made
+        width: 800,
+        height: 600,
+        alt: "Devlyst Logo"
+      }
+    ]
   },
   twitter: {
     card: "summary_large_image",
