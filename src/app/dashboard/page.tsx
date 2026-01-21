@@ -6,19 +6,26 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, ArrowRight, Hash, Settings } from "lucide-react";
 import UserSettings from "@/components/UserSettings";
+import { useUser } from "@clerk/nextjs";
 
 export default function Dashboard() {
     const router = useRouter();
     const [joinRoomId, setJoinRoomId] = useState("");
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [userName, setUserName] = useState("Anonymous");
+    const { user, isLoaded } = useUser();
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const stored = localStorage.getItem("devlyst-username");
-            if (stored) setTimeout(() => setUserName(stored), 0);
+            // If Clerk is available and loaded, use that name, otherwise fallback to local
+            if (isLoaded && user) {
+                setUserName(user.fullName || user.firstName || "Anonymous");
+            } else {
+                const stored = localStorage.getItem("devlyst-username");
+                if (stored) setUserName(stored);
+            }
         }
-    }, []);
+    }, [isLoaded, user]);
 
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
