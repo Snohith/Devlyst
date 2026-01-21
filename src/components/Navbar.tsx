@@ -39,6 +39,10 @@ export function Navbar() {
                         <div className="hidden md:block px-6 py-2 text-sm font-medium text-white bg-white/5 border border-white/10 rounded-full opacity-50">
                             Loading...
                         </div>
+                    ) : !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
+                        <Link href="/sign-in" className="hidden md:block px-6 py-2 text-sm font-medium text-white bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all active:scale-95">
+                            Sign In (Dev)
+                        </Link>
                     ) : (
                         <>
                             <SignedOut>

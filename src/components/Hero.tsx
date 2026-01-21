@@ -50,16 +50,37 @@ export function Hero() {
                 </p>
 
                 <div className="mt-8 flex justify-center gap-4">
-                    <SignedOut>
-                        <SignUpButton mode="modal">
-                            <button
-                                className="px-8 py-3 rounded-full bg-white text-black font-semibold hover:bg-neutral-200 transition-all flex items-center gap-2 group/btn active:scale-95"
-                            >
-                                Get Started
-                                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                            </button>
-                        </SignUpButton>
-                    </SignedOut>
+                    {!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
+                        <button
+                            onClick={() => router.push("/dashboard")}
+                            className="px-8 py-3 rounded-full bg-white text-black font-semibold hover:bg-neutral-200 transition-all flex items-center gap-2 group/btn active:scale-95"
+                        >
+                            Get Started (Dev)
+                            <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </button>
+                    ) : (
+                        <>
+                            <SignedOut>
+                                <SignUpButton mode="modal">
+                                    <button
+                                        className="px-8 py-3 rounded-full bg-white text-black font-semibold hover:bg-neutral-200 transition-all flex items-center gap-2 group/btn active:scale-95"
+                                    >
+                                        Get Started
+                                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                                    </button>
+                                </SignUpButton>
+                            </SignedOut>
+                            <SignedIn>
+                                <button
+                                    onClick={() => router.push("/dashboard")}
+                                    className="px-8 py-3 rounded-full bg-white text-black font-semibold hover:bg-neutral-200 transition-all flex items-center gap-2 active:scale-95"
+                                >
+                                    Open Dashboard
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </SignedIn>
+                        </>
+                    )}
                     <SignedIn>
                         <button
                             onClick={() => router.push("/dashboard")}
