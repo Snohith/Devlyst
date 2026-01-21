@@ -6,6 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { ArrowLeft, Copy, Check, Users, Menu, Wand2, Keyboard } from "lucide-react";
+import { AuthIdentitySync } from "@/components/AuthIdentitySync";
 
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,8 @@ interface RoomPageProps {
     }>;
 }
 
+
+
 export default function RoomPage({ params }: RoomPageProps) {
     const { roomId } = use(params);
     const router = useRouter();
@@ -59,8 +62,6 @@ export default function RoomPage({ params }: RoomPageProps) {
 
     // Identity
     const [userName, setUserName] = useState("Anonymous");
-    // Safe use of Clerk hook (it returns null/undefined safely if provider is missing)
-    const clerk = useUser();
 
     // Feature States
     const [followUserId, setFollowUserId] = useState<number | null>(null);
@@ -69,15 +70,10 @@ export default function RoomPage({ params }: RoomPageProps) {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            // Priority: 1. Clerk User, 2. Local Storage, 3. Anonymous
-            if (clerk.isLoaded && clerk.user) {
-                setUserName(clerk.user.fullName || clerk.user.firstName || "Anonymous");
-            } else {
-                const stored = localStorage.getItem("devlyst-username");
-                if (stored) setUserName(stored);
-            }
+            const stored = localStorage.getItem("devlyst-username");
+            if (stored) setUserName(stored);
         }
-    }, [clerk.isLoaded, clerk.user]);
+    }, []);
 
     const handleEditorMount = (editor: any, monaco: any) => {
         editorInstanceRef.current = editor;
@@ -240,8 +236,13 @@ export default function RoomPage({ params }: RoomPageProps) {
         }
     }, [currentFile]);
 
+
+
     return (
         <main id="main-content" className="h-screen w-full flex flex-col bg-zinc-950 text-foreground overflow-hidden font-sans">
+            {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && (
+                <AuthIdentitySync onUserSync={setUserName} />
+            )}
             <header className="h-14 border-b border-white/10 flex items-center px-4 justify-between bg-zinc-900/50 backdrop-blur-xl z-10 supports-[backdrop-filter]:bg-zinc-900/50">
                 <div className="flex items-center gap-4">
                     <button

@@ -6,26 +6,20 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, ArrowRight, Hash, Settings } from "lucide-react";
 import UserSettings from "@/components/UserSettings";
-import { useUser } from "@clerk/nextjs";
+import { AuthIdentitySync } from "@/components/AuthIdentitySync";
 
 export default function Dashboard() {
     const router = useRouter();
     const [joinRoomId, setJoinRoomId] = useState("");
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     const [userName, setUserName] = useState("Anonymous");
-    const { user, isLoaded } = useUser();
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            // If Clerk is available and loaded, use that name, otherwise fallback to local
-            if (isLoaded && user) {
-                setUserName(user.fullName || user.firstName || "Anonymous");
-            } else {
-                const stored = localStorage.getItem("devlyst-username");
-                if (stored) setUserName(stored);
-            }
+            const stored = localStorage.getItem("devlyst-username");
+            if (stored) setUserName(stored);
         }
-    }, [isLoaded, user]);
+    }, []);
 
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,6 +38,11 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-black text-white font-sans selection:bg-violet-500/30">
+            {/* Conditionally Sync Auth Identity if keys exist */}
+            {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && (
+                <AuthIdentitySync onUserSync={setUserName} />
+            )}
+
             {/* Header */}
             <header className="border-b border-white/10 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
