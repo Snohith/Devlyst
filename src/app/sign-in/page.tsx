@@ -1,6 +1,14 @@
 import { SignIn } from '@clerk/nextjs';
 
 export default function SignInPage() {
+    if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center p-6 text-zinc-400">
+                Authentication is disabled (Missing Publishable Key)
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-black flex items-center justify-center p-6">
             <div className="w-full max-w-md">
