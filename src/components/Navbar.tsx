@@ -12,8 +12,7 @@ export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
-    // This effect intentionally sets mounted state to prevent hydration mismatch
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // Standard mounted check pattern
     useEffect(() => {
         setMounted(true);
     }, []);

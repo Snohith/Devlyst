@@ -9,7 +9,7 @@ export const MovingBorderInput = ({
     onChange,
     placeholder,
     ...props
-}: any) => {
+}: React.InputHTMLAttributes<HTMLInputElement>) => {
     return (
         <div className="relative p-[1px] overflow-hidden rounded-md group w-full">
             <div className="absolute inset-0 h-full w-full animate-rotate-border bg-[conic-gradient(transparent_20deg,var(--primary)_120deg,transparent_180deg)] opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
