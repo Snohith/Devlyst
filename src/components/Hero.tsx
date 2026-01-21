@@ -81,15 +81,7 @@ export function Hero() {
                             </SignedIn>
                         </>
                     )}
-                    <SignedIn>
-                        <button
-                            onClick={() => router.push("/dashboard")}
-                            className="px-8 py-3 rounded-full bg-white text-black font-semibold hover:bg-neutral-200 transition-all flex items-center gap-2 active:scale-95"
-                        >
-                            Open Dashboard
-                            <ArrowRight className="w-4 h-4" />
-                        </button>
-                    </SignedIn>
+
                     <button
                         onClick={() => {
                             const element = document.getElementById("features");

@@ -104,27 +104,37 @@ export function Navbar() {
                                 Blog
                             </Link>
                             {mounted && (
-                                <>
-                                    <SignedOut>
-                                        <SignInButton mode="modal">
-                                            <button
-                                                className="px-4 py-3 text-center font-bold text-white bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors mt-2"
+                                !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
+                                    <Link
+                                        href="/sign-in"
+                                        className="px-4 py-3 text-center font-bold text-white bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors mt-2"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        Sign In (Dev)
+                                    </Link>
+                                ) : (
+                                    <>
+                                        <SignedOut>
+                                            <SignInButton mode="modal">
+                                                <button
+                                                    className="px-4 py-3 text-center font-bold text-white bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors mt-2"
+                                                    onClick={() => setIsOpen(false)}
+                                                >
+                                                    Sign In
+                                                </button>
+                                            </SignInButton>
+                                        </SignedOut>
+                                        <SignedIn>
+                                            <Link
+                                                href="/dashboard"
+                                                className="px-4 py-3 text-center font-bold text-black bg-white rounded-xl hover:bg-zinc-200 transition-colors mt-2"
                                                 onClick={() => setIsOpen(false)}
                                             >
-                                                Sign In
-                                            </button>
-                                        </SignInButton>
-                                    </SignedOut>
-                                    <SignedIn>
-                                        <Link
-                                            href="/dashboard"
-                                            className="px-4 py-3 text-center font-bold text-black bg-white rounded-xl hover:bg-zinc-200 transition-colors mt-2"
-                                            onClick={() => setIsOpen(false)}
-                                        >
-                                            Dashboard
-                                        </Link>
-                                    </SignedIn>
-                                </>
+                                                Dashboard
+                                            </Link>
+                                        </SignedIn>
+                                    </>
+                                )
                             )}
                         </div>
                     </motion.div>
