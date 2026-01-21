@@ -59,7 +59,7 @@ export default function ExecutionPanel({ onRun, isRunning, output, error }: Exec
                         <pre className="text-gray-300 whitespace-pre-wrap">{output}</pre>
                     ) : (
                         <div className="text-muted-foreground italic">
-                            Ready to execute. Click "Run Code" to start.
+                            Ready to execute. Click &quot;Run Code&quot; to start.
                         </div>
                     )}
                 </div>

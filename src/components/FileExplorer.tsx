@@ -9,7 +9,7 @@ import { saveAs } from "file-saver";
 
 interface FileExplorerProps {
     doc: Y.Doc | null;
-    provider: any;
+    provider: any; // Using any for WebsocketProvider to avoid heavy import dependencies if not needed
     currentFile: string;
     onFileSelect: (filename: string) => void;
     isOpen?: boolean;

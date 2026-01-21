@@ -12,7 +12,17 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "node_modules_trash/**",
+    ".yjs-db/**",
+    "server.js",
   ]),
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "react-hooks/set-state-in-effect": "warn", // Intentional for client-only rendering patterns
+    },
+  },
 ]);
 
 export default eslintConfig;

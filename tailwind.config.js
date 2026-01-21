@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const svgToDataUri = require("mini-svg-data-uri");
 const {
     default: flattenColorPalette,

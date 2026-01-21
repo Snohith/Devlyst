@@ -9,7 +9,7 @@ export default function AboutPage() {
                 <div className="max-w-3xl mx-auto text-center">
                     <h1 className="text-4xl font-bold text-white mb-8">About Devlyst</h1>
                     <p className="text-lg text-zinc-400 leading-relaxed mb-6">
-                        Devlyst was born from a simple idea: coding shouldn't be a solitary activity.
+                        Devlyst was born from a simple idea: coding shouldn&apos;t be a solitary activity.
                         We believe that the best software is built together, in real-time, without friction.
                     </p>
                     <p className="text-lg text-zinc-400 leading-relaxed">

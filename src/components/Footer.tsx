@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Github, Twitter, Linkedin } from "lucide-react";
 
 export function Footer() {
@@ -11,7 +12,7 @@ export function Footer() {
                 {/* Logo & Copyright */}
                 <div className="flex flex-col items-center md:items-start gap-4">
                     <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-white">
-                        <img src="/logo.svg" alt="Devlyst Logo" className="w-8 h-8 object-contain" />
+                        <Image src="/logo.svg" alt="Devlyst Logo" width={32} height={32} className="object-contain" />
                         Devlyst
                     </div>
                     <p className="text-zinc-500 text-sm">

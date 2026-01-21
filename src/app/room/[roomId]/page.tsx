@@ -3,20 +3,31 @@
 import { useState, useRef, use, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { ArrowLeft, Copy, Check, Users, Menu } from "lucide-react";
-import ExecutionPanel from "@/components/ExecutionPanel";
+import Image from "next/image";
+import { ArrowLeft, Copy, Check, Users, Menu, Wand2, Keyboard } from "lucide-react";
 
-import UserList from "@/components/UserList";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { ThemeSelector } from "@/components/ThemeSelector";
-import FileExplorer from "@/components/FileExplorer";
 import { cn } from "@/lib/utils";
 import { useCollaboration } from "@/hooks/useCollaboration";
+import { formatCode } from "@/lib/formatter";
 
-// Dynamically import CollaborativeEditor to avoid 'window is not defined' in y-monaco
+// Dynamically import heavy components to improve initial load performance
 const CollaborativeEditor = dynamic(() => import("@/components/CollaborativeEditor"), {
     ssr: false,
     loading: () => <div className="flex items-center justify-center h-full text-zinc-500 animate-pulse font-mono text-xs">Initializing Editor...</div>
+});
+
+const ExecutionPanel = dynamic(() => import("@/components/ExecutionPanel"), {
+    ssr: false,
+    loading: () => <div className="text-xs text-zinc-500 p-2">Loading execution panel...</div>
+});
+
+const FileExplorer = dynamic(() => import("@/components/FileExplorer"), {
+    ssr: false
+});
+
+const UserList = dynamic(() => import("@/components/UserList"), {
+    ssr: false
 });
 
 interface RoomPageProps {
@@ -38,10 +49,11 @@ export default function RoomPage({ params }: RoomPageProps) {
     const [output, setOutput] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isRunning, setIsRunning] = useState(false);
+    const [isFormatting, setIsFormatting] = useState(false);
+    const [isVimMode, setIsVimMode] = useState(false);
     const [users, setUsers] = useState<any[]>([]);
     const [copied, setCopied] = useState(false);
     const [language, setLanguage] = useState("javascript");
-    const [theme, setTheme] = useState("vs-dark");
     const [currentFile, setCurrentFile] = useState("main.js");
 
     // Identity
@@ -62,6 +74,52 @@ export default function RoomPage({ params }: RoomPageProps) {
     const handleEditorMount = (editor: any, monaco: any) => {
         editorInstanceRef.current = editor;
         monacoInstanceRef.current = monaco;
+
+        // Register keyboard shortcut (Shift+Alt+F) manually if needed,
+        // but adding a standard formatting provider is complex with Yjs binding.
+        // For now, we rely on the button, or we can add a dedicated command.
+        editor.addCommand(monaco.KeyMod.Shift | monaco.KeyMod.Alt | monaco.KeyCode.KeyF, () => {
+            handleFormat();
+        });
+    };
+
+    const handleFormat = async () => {
+        if (!editorInstanceRef.current) return;
+
+        setIsFormatting(true);
+        try {
+            const currentCode = editorInstanceRef.current.getValue();
+            const formatted = await formatCode(currentCode, language);
+
+            if (formatted === currentCode) return;
+
+            // Use pushUndoStop to creating a separate undo state
+            editorInstanceRef.current.pushUndoStop();
+
+            // Apply edit preserving cursor roughly (Monaco handles full replace okayish, but edits are better)
+            // However, computing minimal edits is hard without a diff lib.
+            // Replacing full value is the simplest "Formatter" approach for now.
+            // With Yjs, this is treated as a delete all + insert all.
+            // This might disrupt other users' cursors momentarily but is standard for heavy formatters.
+
+            // Better approach: Calculate diff? No, too complex for now.
+            // Just replace.
+
+            // To make it slightly better for Yjs, we use executeEdits
+            const fullRange = editorInstanceRef.current.getModel().getFullModelRange();
+            editorInstanceRef.current.executeEdits("prettier", [{
+                range: fullRange,
+                text: formatted,
+                forceMoveMarkers: true
+            }]);
+
+            editorInstanceRef.current.pushUndoStop();
+
+        } catch (err) {
+            console.error("Formatting failed", err);
+        } finally {
+            setIsFormatting(false);
+        }
     };
 
     const runCode = async () => {
@@ -175,21 +233,22 @@ export default function RoomPage({ params }: RoomPageProps) {
     }, [currentFile]);
 
     return (
-        <main className="h-screen w-full flex flex-col bg-zinc-950 text-foreground overflow-hidden font-sans">
+        <main id="main-content" className="h-screen w-full flex flex-col bg-zinc-950 text-foreground overflow-hidden font-sans">
             <header className="h-14 border-b border-white/10 flex items-center px-4 justify-between bg-zinc-900/50 backdrop-blur-xl z-10 supports-[backdrop-filter]:bg-zinc-900/50">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => router.push('/dashboard')}
                         className="p-2 hover:bg-white/10 rounded-full transition-colors text-zinc-400 hover:text-white"
                         title="Back to Dashboard"
+                        aria-label="Back to Dashboard"
                     >
-                        <ArrowLeft className="w-5 h-5" />
+                        <ArrowLeft className="w-5 h-5" aria-hidden="true" />
                     </button>
 
                     <div className="h-6 w-[1px] bg-white/10 mx-2 hidden sm:block"></div>
 
                     <div className="flex items-center gap-2">
-                        <img src="/logo.svg" alt="Devlyst" className="w-8 h-8 object-contain" />
+                        <Image src="/logo.svg" alt="Devlyst" width={32} height={32} className="object-contain" />
                         <h1 className="font-semibold tracking-tight text-white/90 hidden sm:block">Devlyst</h1>
                         <div className={cn(
                             "w-2 h-2 rounded-full transition-colors ml-2",
@@ -197,17 +256,42 @@ export default function RoomPage({ params }: RoomPageProps) {
                         )} title={`Status: ${status}`} />
                     </div>
 
-                    <div
+                    <button
                         onClick={copyRoomLink}
                         className="flex items-center gap-2 px-3 py-1.5 bg-zinc-800/50 hover:bg-zinc-800 border border-white/10 rounded-md cursor-pointer transition-all hover:border-white/20 ml-4 group active:scale-95 duration-75"
+                        aria-label={copied ? "Room link copied" : "Copy room link"}
+                        title={copied ? "Room link copied" : "Copy room link"}
                     >
                         <span className="text-xs text-zinc-400 font-mono">ID: <span className="text-zinc-200 group-hover:text-white transition-colors">{roomId}</span></span>
-                        {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-zinc-500 group-hover:text-zinc-300" />}
-                    </div>
+                        {copied ? <Check className="w-3 h-3 text-green-500" aria-hidden="true" /> : <Copy className="w-3 h-3 text-zinc-500 group-hover:text-zinc-300" aria-hidden="true" />}
+                    </button>
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <ThemeSelector currentTheme={theme} onThemeChange={setTheme} />
+                    <button
+                        onClick={() => setIsVimMode(!isVimMode)}
+                        className={cn(
+                            "p-2 hover:bg-white/10 rounded-md transition-colors",
+                            isVimMode ? "text-green-400 bg-white/5" : "text-zinc-400 hover:text-white"
+                        )}
+                        title={isVimMode ? "Disable Vim Mode" : "Enable Vim Mode"}
+                        aria-label={isVimMode ? "Disable Vim Mode" : "Enable Vim Mode"}
+                        aria-pressed={isVimMode}
+                    >
+                        <Keyboard className="w-5 h-5" aria-hidden="true" />
+                    </button>
+
+                    <button
+                        onClick={handleFormat}
+                        disabled={isFormatting}
+                        className="p-2 hover:bg-white/10 rounded-md transition-colors text-zinc-400 hover:text-white disabled:opacity-50"
+                        title="Format Code (Shift+Alt+F)"
+                        aria-label="Format code (Shift+Alt+F)"
+                        aria-busy={isFormatting}
+                    >
+                        <Wand2 className={cn("w-5 h-5", isFormatting && "animate-pulse text-violet-400")} aria-hidden="true" />
+                    </button>
+
                     <LanguageSelector value={language} onChange={handleLanguageChange} />
 
                     <UserList
@@ -281,8 +365,8 @@ export default function RoomPage({ params }: RoomPageProps) {
                                         onAwarenessChange={setUsers}
                                         language={language}
                                         onLanguageChange={setLanguage}
-                                        theme={theme}
                                         followUserId={followUserId}
+                                        isVimMode={isVimMode}
                                         doc={doc}
                                         provider={provider}
                                         filename={currentFile}

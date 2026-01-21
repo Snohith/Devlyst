@@ -4,9 +4,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+
   async headers() {
     return [
       {
@@ -27,7 +25,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             // Relaxed CSP for Monaco Editor Workers (blob:), Render WebSockets, and CDN resources
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://cdn.jsdelivr.net; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net https://r2cdn.perplexity.ai; connect-src 'self' ws: wss: https://emkc.org https://*.onrender.com https://cdn.jsdelivr.net; img-src 'self' data: https:; object-src 'none';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://cdn.jsdelivr.net https://*.clerk.accounts.dev; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net https://r2cdn.perplexity.ai; connect-src 'self' ws: wss: https://emkc.org https://*.onrender.com https://cdn.jsdelivr.net https://*.clerk.accounts.dev; img-src 'self' data: https:; object-src 'none';",
           }
         ],
       },
@@ -35,4 +33,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+});
+
+export default withPWA(nextConfig);

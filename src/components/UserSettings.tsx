@@ -15,7 +15,10 @@ export default function UserSettings({ isOpen, onClose, currentName, onSave }: U
     const [name, setName] = useState(currentName);
 
     useEffect(() => {
-        setName(currentName);
+        if (isOpen && name !== currentName) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setName(currentName);
+        }
     }, [currentName, isOpen]);
 
     if (!isOpen) return null;

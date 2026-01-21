@@ -1,4 +1,9 @@
 require('dotenv').config();
+console.log('[Debug] Loaded Env Vars:', {
+    PORT: process.env.PORT,
+    YPERSISTENCE: process.env.YPERSISTENCE,
+    WS_PORT: process.env.NEXT_PUBLIC_WS_PORT
+});
 const WebSocket = require('ws');
 const http = require('http');
 

@@ -22,13 +22,18 @@ interface CollaborativeEditorProps {
     onAwarenessChange?: (users: any[]) => void;
     language?: string;
     onLanguageChange?: (lang: string) => void;
-    theme?: string;
     followUserId?: number | null;
+    isVimMode?: boolean; // New prop
     doc: Y.Doc | null;
     provider: WebsocketProvider | null;
     filename: string;
     userName: string;
 }
+
+// Import monaco-vim dynamically or just verify it works with SSR false (Client Header is present so standard import usually OK, but require() inside effect is safer for some libs). 
+// Actually standard import `import { initVimMode } from 'monaco-vim'` works if the component is client-side only.
+// But `monaco-vim` might depend on `window`. Let's use `require` inside the effect or dynamic import.
+import { initVimMode } from "monaco-vim";
 
 export default function CollaborativeEditor({
     roomId,
@@ -38,7 +43,7 @@ export default function CollaborativeEditor({
     onAwarenessChange,
     onLanguageChange,
     language = "javascript",
-    theme = "vs-dark",
+    isVimMode = false,
     followUserId = null,
     doc,
     provider,
@@ -49,21 +54,41 @@ export default function CollaborativeEditor({
     const [monacoRef, setMonacoRef] = useState<any>(null);
     const [yMap, setYMap] = useState<Y.Map<any> | null>(null);
 
-    // Apply Theme Changes
-    useEffect(() => {
-        if (monacoRef && theme) {
-            monacoRef.editor.setTheme(theme);
-        }
-    }, [theme, monacoRef]);
+    const vimModeRef = useRef<any>(null);
+    const statusNodeRef = useRef<HTMLDivElement>(null);
 
     // Stable User Identity (Color persists, name updates)
-    // We use a ref for color so it doesn't change when name changes
-    const userColor = useRef(USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]);
+    const [color] = useState(() => USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]);
 
     const user = useMemo(() => ({
         name: userName,
-        color: userColor.current
-    }), [userName]);
+        color
+    }), [userName, color]);
+
+    // Handle typing events
+    useEffect(() => {
+        if (!provider || !editorRef) return;
+
+        let typingTimeout: NodeJS.Timeout;
+
+        const handleContentChange = () => {
+            // Set local state to typing
+            provider.awareness.setLocalStateField('isTyping', true);
+
+            // Clear typing status after 1s of inactivity
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                provider.awareness.setLocalStateField('isTyping', false);
+            }, 1000);
+        };
+
+        const disposable = editorRef.onDidChangeModelContent(handleContentChange);
+
+        return () => {
+            disposable.dispose();
+            clearTimeout(typingTimeout);
+        };
+    }, [provider, editorRef]);
 
     const handleEditorDidMount: OnMount = (editor, monaco) => {
         setEditorRef(editor);
@@ -74,6 +99,32 @@ export default function CollaborativeEditor({
     // Use Custom Hooks
     useCursorBroadcasting(editorRef, provider, user);
     useFollowUser(editorRef, provider, followUserId);
+
+    // Vim Mode Effect
+    useEffect(() => {
+        if (!editorRef || !statusNodeRef.current) return;
+
+        if (isVimMode) {
+            if (!vimModeRef.current) {
+                // Attach Vim Mode
+                const vim = initVimMode(editorRef, statusNodeRef.current);
+                vimModeRef.current = vim;
+            }
+        } else {
+            if (vimModeRef.current) {
+                // Detach Vim Mode
+                vimModeRef.current.dispose();
+                vimModeRef.current = null;
+            }
+        }
+
+        return () => {
+            if (vimModeRef.current) {
+                vimModeRef.current.dispose();
+                vimModeRef.current = null;
+            }
+        };
+    }, [isVimMode, editorRef]);
 
     // Update Monaco Language when prop changes
     useEffect(() => {
@@ -98,7 +149,7 @@ export default function CollaborativeEditor({
         if (!provider || !doc) return;
 
         const configMap = doc.getMap("config");
-        setYMap(configMap);
+        setTimeout(() => setYMap(configMap), 0);
 
         const handleConfigChange = () => {
             const newLang = configMap.get("language");
@@ -173,7 +224,7 @@ export default function CollaborativeEditor({
 
         // Check if already synced
         if (provider.shouldConnect && provider.wsconnected && provider.synced) {
-            setIsSynced(true);
+            setTimeout(() => setIsSynced(true), 0);
         }
 
         const onSync = (isSynced: boolean) => {
@@ -264,6 +315,60 @@ export default function CollaborativeEditor({
                     className="bg-transparent"
                 />
             </div>
+            {/* Vim Status Bar (only shown when Vim is active) */}
+            {/* Vim Status Bar (only shown when Vim is active) */}
+            <div
+                ref={statusNodeRef}
+                className={cn(
+                    "w-full bg-[#1e1e1e] border-t border-white/10 text-xs px-2 py-1 font-mono text-zinc-400 min-h-[24px]",
+                    !isVimMode && "hidden"
+                )}
+            />
+
+            {/* Typing Indicator Overlay */}
+            <TypingIndicator users={[]} provider={provider} />
+        </div>
+    );
+}
+
+// Typing Indicator Component
+function TypingIndicator({ users, provider }: { users: any[], provider: WebsocketProvider | null }) {
+    const [typingUsers, setTypingUsers] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (!provider) return;
+
+        const updateTypingStatus = () => {
+            const states = Array.from(provider.awareness.getStates().values());
+            const typing = states.filter((state: any) => state.isTyping && state.user?.name);
+            setTypingUsers(typing);
+        };
+
+        provider.awareness.on('change', updateTypingStatus);
+        return () => provider.awareness.off('change', updateTypingStatus);
+    }, [provider]);
+
+    if (typingUsers.length === 0) return null;
+
+    return (
+        <div className="absolute bottom-8 right-6 z-50 bg-black/80 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-full text-xs text-zinc-400 flex items-center gap-2 shadow-lg animate-in slide-in-from-bottom-2 fade-in duration-200 pointer-events-none">
+            <div className="flex -space-x-1.5">
+                {typingUsers.slice(0, 3).map((state: any, i) => (
+                    <div
+                        key={i}
+                        className="w-2 h-2 rounded-full ring-2 ring-black"
+                        style={{ backgroundColor: state.user?.color || '#888' }}
+                    />
+                ))}
+            </div>
+            <span>
+                {typingUsers.length === 1
+                    ? `${typingUsers[0].user.name} is typing...`
+                    : typingUsers.length === 2
+                        ? `${typingUsers[0].user.name} and ${typingUsers[1].user.name} are typing...`
+                        : `${typingUsers[0].user.name} and ${typingUsers.length - 1} others are typing...`
+                }
+            </span>
         </div>
     );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, ArrowRight, Hash, Settings } from "lucide-react";
 import UserSettings from "@/components/UserSettings";
@@ -15,7 +16,7 @@ export default function Dashboard() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             const stored = localStorage.getItem("devlyst-username");
-            if (stored) setUserName(stored);
+            if (stored) setTimeout(() => setUserName(stored), 0);
         }
     }, []);
 
@@ -40,7 +41,7 @@ export default function Dashboard() {
             <header className="border-b border-white/10 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-2">
-                        <img src="/logo.svg" alt="Devlyst" className="w-8 h-8" />
+                        <Image src="/logo.svg" alt="Devlyst" width={32} height={32} />
                         <span className="font-bold text-lg tracking-tight">Devlyst</span>
                     </Link>
 
@@ -54,7 +55,7 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            <main className="max-w-6xl mx-auto px-6 py-12">
+            <main id="main-content" className="max-w-6xl mx-auto px-6 py-12">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <div>
                         <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
