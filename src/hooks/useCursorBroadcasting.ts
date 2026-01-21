@@ -12,7 +12,7 @@ export function useCursorBroadcasting(
 
         // Update user identity in awareness
         provider.awareness.setLocalStateField("user", user);
-    }, [provider, user.name, user.color]);
+    }, [provider, user]);
 
     // 2. Broadcast Cursor Position (Throttled)
     useEffect(() => {
