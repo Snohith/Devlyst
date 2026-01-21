@@ -74,33 +74,47 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Safety check for Clerk key to prevent build failures
+  // In production build environments (like Render static build), env vars might be missing initially.
+  // We allow the build to proceed, but the app will warn at runtime.
+  const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const isAuthEnabled = !!clerkKey;
+
+  const content = (
+    <html lang="en">
+      <head>
+        {/* Plausible Analytics - Privacy-focused, GDPR compliant */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <Script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+          />
+        )}
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/* Skip to main content link for accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 focus-visible:px-4 focus-visible:py-2 focus-visible:bg-white focus-visible:text-black focus-visible:rounded-lg focus-visible:shadow-lg"
+        >
+          Skip to main content
+        </a>
+        <InstallPrompt />
+        {children}
+      </body>
+    </html>
+  );
+
+  if (!isAuthEnabled) {
+    return content;
+  }
+
   return (
     <ClerkProvider>
-      <html lang="en">
-        <head>
-          {/* Plausible Analytics - Privacy-focused, GDPR compliant */}
-          {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
-            <Script
-              defer
-              data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
-              src="https://plausible.io/js/script.js"
-            />
-          )}
-        </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {/* Skip to main content link for accessibility */}
-          <a
-            href="#main-content"
-            className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 focus-visible:px-4 focus-visible:py-2 focus-visible:bg-white focus-visible:text-black focus-visible:rounded-lg focus-visible:shadow-lg"
-          >
-            Skip to main content
-          </a>
-          <InstallPrompt />
-          {children}
-        </body>
-      </html>
+      {content}
     </ClerkProvider>
   );
 }
