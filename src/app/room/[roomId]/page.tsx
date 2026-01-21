@@ -2,6 +2,7 @@
 
 import { useState, useRef, use, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { ArrowLeft, Copy, Check, Users, Menu, Wand2, Keyboard } from "lucide-react";
@@ -58,6 +59,8 @@ export default function RoomPage({ params }: RoomPageProps) {
 
     // Identity
     const [userName, setUserName] = useState("Anonymous");
+    // Safe use of Clerk hook (it returns null/undefined safely if provider is missing)
+    const clerk = useUser();
 
     // Feature States
     const [followUserId, setFollowUserId] = useState<number | null>(null);
@@ -66,10 +69,15 @@ export default function RoomPage({ params }: RoomPageProps) {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const stored = localStorage.getItem("devlyst-username");
-            if (stored) setUserName(stored);
+            // Priority: 1. Clerk User, 2. Local Storage, 3. Anonymous
+            if (clerk.isLoaded && clerk.user) {
+                setUserName(clerk.user.fullName || clerk.user.firstName || "Anonymous");
+            } else {
+                const stored = localStorage.getItem("devlyst-username");
+                if (stored) setUserName(stored);
+            }
         }
-    }, []);
+    }, [clerk.isLoaded, clerk.user]);
 
     const handleEditorMount = (editor: any, monaco: any) => {
         editorInstanceRef.current = editor;
