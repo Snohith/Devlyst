@@ -1,5 +1,0 @@
-[dotenv@17.2.3] injecting env (4) from .env -- tip: ⚙️  override existing env vars with { override: true }
-[Debug] Loaded Env Vars: { PORT: '1234', YPERSISTENCE: './.yjs-db', WS_PORT: '1234' }
-Persisting documents to "./.yjs-db"
-WebSocket server running on port 1234 (0.0.0.0)
-Allowed Origins: http://localhost:3000, http://127.0.0.1:3000, http://10.199.34.179:3000

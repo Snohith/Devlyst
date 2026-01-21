@@ -277,7 +277,7 @@ export default function CollaborativeEditor({
             const currentYText = filesMap.get(filename) as Y.Text;
             // If the object reference changed (someone else replaced the file), we must re-bind
             if (currentYText !== yText) {
-                console.log("[Devlyst] File replaced remotely, re-binding...");
+
                 setBindingVersion(v => v + 1);
             }
         };
