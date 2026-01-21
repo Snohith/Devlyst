@@ -35,6 +35,8 @@ interface CollaborativeEditorProps {
 // But `monaco-vim` might depend on `window`. Let's use `require` inside the effect or dynamic import.
 import { initVimMode } from "monaco-vim";
 
+export type MonacoEditor = Parameters<OnMount>[0];
+
 export default function CollaborativeEditor({
     roomId,
     className,
@@ -50,9 +52,9 @@ export default function CollaborativeEditor({
     filename,
     userName
 }: CollaborativeEditorProps) {
-    const [editorRef, setEditorRef] = useState<any>(null);
-    const [monacoRef, setMonacoRef] = useState<any>(null);
-    const [yMap, setYMap] = useState<Y.Map<any> | null>(null);
+    const [editorRef, setEditorRef] = useState<MonacoEditor | null>(null);
+    const [monacoRef, setMonacoRef] = useState<Parameters<OnMount>[1] | null>(null);
+    const [yMap, setYMap] = useState<Y.Map<unknown> | null>(null);
 
     const vimModeRef = useRef<any>(null);
     const statusNodeRef = useRef<HTMLDivElement>(null);
@@ -261,11 +263,14 @@ export default function CollaborativeEditor({
         // 2. Get the current shared type
         const yText = filesMap.get(filename) as Y.Text;
 
+        const model = editorRef.getModel();
+        if (!model) return;
+
         // 3. Create Binding
         // @ts-ignore
         const newBinding = new MonacoBinding(
             yText,
-            editorRef.getModel(),
+            model,
             new Set([editorRef]),
             provider.awareness
         );

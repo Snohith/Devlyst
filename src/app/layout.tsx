@@ -62,6 +62,10 @@ export const metadata: Metadata = {
 
 
 import { ClerkProvider } from "@clerk/nextjs";
+
+if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+  console.error("❌ MISSING CLERK PUBLISHABLE KEY. Please add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env or deployment configuration.");
+}
 import Script from "next/script";
 import { InstallPrompt } from "@/components/InstallPrompt";
 
