@@ -37,7 +37,9 @@ export function validateOrigin(request: Request): boolean {
     const allowedOrigins = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") // Remove trailing slash if present
+        "https://devlyst-web.onrender.com",
+        process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, ""), // Remove trailing slash if present
+        process.env.RENDER_EXTERNAL_URL?.replace(/\/$/, "") // Auto-provided by Render
     ].filter((url): url is string => !!url);
 
     if (origin && !allowedOrigins.includes(origin)) return false;
