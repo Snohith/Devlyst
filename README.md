@@ -9,7 +9,7 @@
 - **Frontend**: Vite + React 19 + Tailwind CSS + Monaco Editor + Clerk Auth
 - **Backend API**: Node.js + Express 5 + PostgreSQL (Prisma ORM)
 - **Real-Time Collaboration**: Dedicated WebSocket Server + Yjs CRDTs
-- **Code Execution**: Piston API via server proxy
+- **Code Execution**: Judge0 Community Edition API via server proxy (`/api/execute`)
 
 See [docs/MIGRATION.md](docs/MIGRATION.md) for detailed architecture and running instructions.
 

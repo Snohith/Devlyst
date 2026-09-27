@@ -19,19 +19,26 @@ export const EXTENSION_TO_LANGUAGE = Object.fromEntries(
   EDITOR_LANGUAGES.map((language) => [language.extension, language.value]),
 );
 
-// Piston runtimes that the public emkc.org instance currently accepts.
+// Judge0 Community Edition runtimes used for code execution.
+// The ids are the official language ids of https://ce.judge0.com/languages.
 // Languages without an entry can still be edited, but not executed.
-export const PISTON_RUNTIMES = {
-  javascript: { language: "javascript", version: "18.15.0" },
-  typescript: { language: "typescript", version: "5.0.3" },
-  python: { language: "python", version: "3.10.0" },
-  java: { language: "java", version: "15.0.2" },
-  c: { language: "c", version: "10.2.0" },
-  cpp: { language: "c++", version: "10.2.0" },
-  go: { language: "go", version: "1.16.2" },
-  rust: { language: "rust", version: "1.68.2" },
-  php: { language: "php", version: "8.2.3" },
+export const JUDGE0_LANGUAGES = {
+  javascript: { id: 93, name: "JavaScript (Node.js 18.15.0)" },
+  typescript: { id: 94, name: "TypeScript (5.0.3)" },
+  python: { id: 92, name: "Python (3.11.2)" },
+  java: { id: 91, name: "Java (JDK 17.0.6)" },
+  c: { id: 103, name: "C (GCC 14.1.0)" },
+  cpp: { id: 105, name: "C++ (GCC 14.1.0)" },
+  csharp: { id: 51, name: "C# (Mono 6.6.0.161)" },
+  go: { id: 107, name: "Go (1.23.5)" },
+  rust: { id: 108, name: "Rust (1.85.0)" },
+  php: { id: 98, name: "PHP (8.3.11)" },
+  ruby: { id: 72, name: "Ruby (2.7.0)" },
+  sql: { id: 82, name: "SQL (SQLite 3.27.2)" },
 };
+
+// Java entry point must stay `Main` because Judge0 compiles the file as Main.java.
+export const EXECUTABLE_LANGUAGES = Object.keys(JUDGE0_LANGUAGES);
 
 export const ROOM_CODE_PATTERN = /^\d{5}$/;
 export const MAX_SOURCE_BYTES = 100_000;

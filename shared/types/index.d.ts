@@ -47,11 +47,17 @@ export interface ExecutionRequest {
 export interface ExecutionResult {
   language: string;
   version: string;
+  runtime?: string;
   output: string;
+  error?: string | null;
   stderr: string | null;
   compileOutput: string | null;
   exitCode: number | null;
   signal: string | null;
+  status?: string;
+  statusId?: number;
+  timeMs?: number | null;
+  memoryKb?: number | null;
 }
 
 export interface ApiSuccess<T> {

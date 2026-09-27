@@ -1,15 +1,15 @@
 import { z } from "zod";
 import {
   EDITOR_LANGUAGES,
+  EXECUTABLE_LANGUAGES,
   MAX_FILE_NAME_LENGTH,
   MAX_SOURCE_BYTES,
   MAX_STDIN_BYTES,
-  PISTON_RUNTIMES,
   ROOM_CODE_PATTERN,
 } from "../constants/languages.js";
 
 const languageValues = EDITOR_LANGUAGES.map((language) => language.value);
-const executableLanguages = Object.keys(PISTON_RUNTIMES);
+const executableLanguages = EXECUTABLE_LANGUAGES;
 
 export const displayNameSchema = z
   .string()

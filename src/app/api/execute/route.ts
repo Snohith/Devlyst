@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 import { isRateLimited, validateOrigin } from '@/lib/security';
+import {
+    Judge0Error,
+    JUDGE0_LANGUAGES,
+    executeWithJudge0,
+    getJudge0Runtime,
+} from '@/lib/judge0';
 
-const PISTON_API_URL = "https://emkc.org/api/v2/piston/execute";
+// Judge0 submissions (compile + run) can take a few seconds.
+export const maxDuration = 30;
+
+const MAX_SOURCE_BYTES = 100_000;
 
 export async function POST(request: Request) {
     // 1. Validate Origin
@@ -24,50 +33,66 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Too Many Requests" }, { status: 429 });
     }
 
+    let payload: { code?: unknown; language?: unknown; stdin?: unknown };
     try {
-        const { code, language } = await request.json();
+        payload = await request.json();
+    } catch {
+        return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    }
 
-        // Map internal language names to Piston runtimes
-        const runtimeMap: { [key: string]: { language: string, version: string } } = {
-            javascript: { language: "javascript", version: "18.15.0" },
-            typescript: { language: "typescript", version: "5.0.3" },
-            python: { language: "python", version: "3.10.0" },
-            java: { language: "java", version: "15.0.2" },
-            c: { language: "c", version: "10.2.0" },
-            cpp: { language: "c++", version: "10.2.0" },
-            go: { language: "go", version: "1.16.2" },
-            rust: { language: "rust", version: "1.68.2" },
-            php: { language: "php", version: "8.2.3" },
-        };
+    const code = typeof payload.code === "string" ? payload.code : "";
+    const language = typeof payload.language === "string" ? payload.language : "javascript";
+    const stdin = typeof payload.stdin === "string" ? payload.stdin : "";
 
-        const config = runtimeMap[language] || runtimeMap.javascript;
+    if (!code.trim()) {
+        return NextResponse.json({ error: "Nothing to run - the editor is empty." }, { status: 400 });
+    }
 
-        const response = await fetch(PISTON_API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                language: config.language,
-                version: config.version,
-                files: [
-                    {
-                        content: code
-                    }
-                ]
-            })
+    if (Buffer.byteLength(code, "utf8") > MAX_SOURCE_BYTES) {
+        return NextResponse.json(
+            { error: "Source code is too large to execute (limit: 100 KB)." },
+            { status: 400 }
+        );
+    }
+
+    // HTML/CSS are editable in Devlyst but cannot be executed by a judge.
+    if (!getJudge0Runtime(language)) {
+        return NextResponse.json(
+            {
+                error: `Languages that can be executed: ${Object.keys(JUDGE0_LANGUAGES)
+                    .map((key) => JUDGE0_LANGUAGES[key].name)
+                    .join(", ")}.`,
+            },
+            { status: 400 }
+        );
+    }
+
+    // 3. Execute through Judge0 (replaces the retired public Piston API).
+    try {
+        const result = await executeWithJudge0({ code, language, stdin });
+
+        return NextResponse.json({
+            output: result.output,
+            error: result.error,
+            stderr: result.stderr,
+            compileOutput: result.compileOutput,
+            exitCode: result.exitCode,
+            signal: result.signal,
+            status: result.status,
+            timeMs: result.timeMs,
+            memoryKb: result.memoryKb,
+            language: result.language,
+            runtime: result.runtime,
         });
-
-        const data = await response.json();
-
-        if (data.run) {
-            return NextResponse.json({
-                output: data.run.output,
-                error: data.run.stderr || null
-            });
+    } catch (err) {
+        if (err instanceof Judge0Error) {
+            console.error("Execution Error:", err.kind, err.detail ?? err.message);
+            return NextResponse.json(
+                { output: "", error: err.message, status: err.kind },
+                { status: err.status }
+            );
         }
 
-        return NextResponse.json({ output: "", error: "Execution failed to start." });
-
-    } catch (err) {
         console.error("Execution Error:", err);
         return NextResponse.json({ error: "Server error during execution" }, { status: 500 });
     }

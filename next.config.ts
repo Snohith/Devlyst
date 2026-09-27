@@ -24,8 +24,8 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            // Relaxed CSP for Monaco Editor Workers (blob:), Render WebSockets, and CDN resources
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://cdn.jsdelivr.net https://*.clerk.accounts.dev; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net https://r2cdn.perplexity.ai https://frontend-cdn.perplexity.ai; connect-src 'self' ws: wss: https://emkc.org https://*.onrender.com https://cdn.jsdelivr.net https://*.clerk.accounts.dev; img-src 'self' data: https:; object-src 'none';",
+            // Relaxed CSP for Monaco Editor Workers (blob:), Render WebSockets, Clerk, and the code execution API
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://cdn.jsdelivr.net https://*.clerk.accounts.dev; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net https://r2cdn.perplexity.ai https://frontend-cdn.perplexity.ai; connect-src 'self' ws: wss: https://ce.judge0.com https://*.onrender.com https://cdn.jsdelivr.net https://*.clerk.accounts.dev; img-src 'self' data: https:; object-src 'none';",
           }
         ],
       },

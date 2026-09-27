@@ -42,7 +42,10 @@ export const env = {
   databaseUrl: process.env.DATABASE_URL || "",
   clerkSecretKey: process.env.CLERK_SECRET_KEY || "",
   clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY || process.env.VITE_CLERK_PUBLISHABLE_KEY || "",
-  pistonUrl: process.env.PISTON_URL || "https://emkc.org/api/v2/piston/execute",
+  judge0ApiUrl: (process.env.JUDGE0_API_URL || "https://ce.judge0.com").replace(/\/+$/, ""),
+  // Optional: only needed when pointing at a RapidAPI-hosted Judge0 instance.
+  judge0ApiKey: process.env.JUDGE0_API_KEY || "",
+  judge0ApiHost: process.env.JUDGE0_API_HOST || "",
   websocketUrl: process.env.WEBSOCKET_PUBLIC_URL || "ws://localhost:1234",
   logLevel: process.env.LOG_LEVEL || (isProduction ? "info" : "debug"),
 };

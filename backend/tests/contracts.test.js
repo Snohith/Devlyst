@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_FILE_CONTENT,
   DEFAULT_FILE_NAME,
+  EXECUTABLE_LANGUAGES,
   EXTENSION_TO_LANGUAGE,
-  PISTON_RUNTIMES,
+  JUDGE0_LANGUAGES,
   ROOM_CODE_PATTERN,
 } from "../../shared/constants/languages.js";
 import {
@@ -20,9 +21,12 @@ describe("shared/constants/languages", () => {
     expect(EXTENSION_TO_LANGUAGE.rs).toBe("rust");
   });
 
-  it("exposes supported Piston runtimes", () => {
-    expect(PISTON_RUNTIMES.javascript.language).toBe("javascript");
-    expect(PISTON_RUNTIMES.python.language).toBe("python");
+  it("exposes supported Judge0 runtimes", () => {
+    expect(JUDGE0_LANGUAGES.javascript.id).toBe(93);
+    expect(JUDGE0_LANGUAGES.python.id).toBe(92);
+    expect(JUDGE0_LANGUAGES.java.id).toBe(91);
+    expect(EXECUTABLE_LANGUAGES).toContain("cpp");
+    expect(EXECUTABLE_LANGUAGES).not.toContain("html");
   });
 
   it("validates 5-digit room codes", () => {
@@ -53,5 +57,10 @@ describe("shared/schemas", () => {
     expect(valid.success).toBe(true);
     const invalid = executionSchema.safeParse({ language: "python", code: "" });
     expect(invalid.success).toBe(false);
+  });
+
+  it("rejects non executable languages", () => {
+    const html = executionSchema.safeParse({ language: "html", code: "<h1>hi</h1>" });
+    expect(html.success).toBe(false);
   });
 });

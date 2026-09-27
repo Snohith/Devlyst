@@ -38,6 +38,17 @@ interface RoomPageProps {
     }>;
 }
 
+/** Builds the short status line shown in the execution panel header. */
+function buildRunMeta(data: { status?: unknown; exitCode?: unknown; timeMs?: unknown }): string | null {
+    const parts: string[] = [];
+
+    if (typeof data.status === "string") parts.push(data.status);
+    if (typeof data.exitCode === "number") parts.push(`exit ${data.exitCode}`);
+    if (typeof data.timeMs === "number") parts.push(`${(data.timeMs / 1000).toFixed(2)}s`);
+
+    return parts.length > 0 ? parts.join(" \u2022 ") : null;
+}
+
 
 
 export default function RoomPage({ params }: RoomPageProps) {
@@ -52,6 +63,7 @@ export default function RoomPage({ params }: RoomPageProps) {
 
     const [output, setOutput] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [runMeta, setRunMeta] = useState<string | null>(null);
     const [isRunning, setIsRunning] = useState(false);
     const [isFormatting, setIsFormatting] = useState(false);
     const [isVimMode, setIsVimMode] = useState(false);
@@ -132,6 +144,7 @@ export default function RoomPage({ params }: RoomPageProps) {
         setIsRunning(true);
         setOutput(null);
         setError(null);
+        setRunMeta(null);
 
         const code = editorInstanceRef.current.getValue();
 
@@ -142,14 +155,18 @@ export default function RoomPage({ params }: RoomPageProps) {
                 body: JSON.stringify({ code, language }),
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => null);
 
-            if (data.error) {
-                setError(data.error);
-            } else {
-                setOutput(data.output);
+            if (!data) {
+                setError(`Execution failed (HTTP ${response.status}).`);
+                return;
             }
+
+            setOutput(typeof data.output === "string" && data.output.length > 0 ? data.output : null);
+            setError(typeof data.error === "string" && data.error.length > 0 ? data.error : null);
+            setRunMeta(buildRunMeta(data));
         } catch (err) {
+            console.error("Execution request failed", err);
             setError("Failed to execute code. Check connection.");
         } finally {
             setIsRunning(false);
@@ -392,6 +409,7 @@ export default function RoomPage({ params }: RoomPageProps) {
                             isRunning={isRunning}
                             output={output}
                             error={error}
+                            meta={runMeta}
                         />
                     </div>
                 </div>
