@@ -27,4 +27,11 @@ Sentry.init({
             blockAllMedia: true,
         }),
     ],
+
+    // Ignore benign Monaco editor cancellation errors (e.g. Safari clipboard workaround or canceled autocompletions)
+    ignoreErrors: [
+        "Canceled",
+        "Canceled: Canceled",
+        /^Canceled: Canceled$/,
+    ],
 });
