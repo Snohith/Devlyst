@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(uuid()) @db.Uuid
+  clerkId     String   @unique
+  email       String?
+  displayName String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownedProjects Project[]       @relation("ProjectOwner")
+  memberships   ProjectMember[]
+  executions    Execution[]
+
+  @@index([email])
+}
+
+model Project {
+  id        String   @id @default(uuid()) @db.Uuid
+  roomCode  String   @unique
+  name      String
+  language  String   @default("javascript")
+  ownerId   String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner      User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members    ProjectMember[]
+  files      File[]
+  executions Execution[]
+
+  @@index([ownerId])
+  @@index([updatedAt])
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid()) @db.Uuid
+  projectId String   @db.Uuid
+  userId    String   @db.Uuid
+  role      Role     @default(EDITOR)
+  joinedAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+model File {
+  id        String   @id @default(uuid()) @db.Uuid
+  projectId String   @db.Uuid
+  name      String
+  language  String   @default("javascript")
+  content   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, name])
+  @@index([projectId])
+}
+
+model Execution {
+  id         String   @id @default(uuid()) @db.Uuid
+  projectId  String?  @db.Uuid
+  userId     String   @db.Uuid
+  language   String
+  version    String
+  status     String
+  exitCode   Int?
+  createdAt  DateTime @default(now())
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([projectId])
+}
+
+enum Role {
+  OWNER
+  EDITOR
+}

@@ -82,16 +82,7 @@ export default function RootLayout({
 
   const content = (
     <html lang="en">
-      <head>
-        {/* Plausible Analytics - Privacy-focused, GDPR compliant */}
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
-          <Script
-            defer
-            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
-            src="https://plausible.io/js/script.js"
-          />
-        )}
-      </head>
+      <head />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -102,6 +93,14 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        {/* Plausible Analytics - Privacy-focused, GDPR compliant */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <Script
+            strategy="afterInteractive"
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+          />
+        )}
         <InstallPrompt />
         {children}
       </body>

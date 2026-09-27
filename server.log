@@ -1,4 +1,0 @@
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
-[Debug] Loaded Env Vars: { PORT: undefined, YPERSISTENCE: undefined, WS_PORT: undefined }
-WebSocket server running on port 1234 (0.0.0.0)
-Allowed Origins: http://localhost:3000, http://127.0.0.1:3000
