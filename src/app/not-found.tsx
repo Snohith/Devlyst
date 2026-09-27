@@ -5,7 +5,6 @@ export default function NotFound() {
     return (
         <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
 
-            {/* Ambient Background */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-900/20 via-black to-black" />
             <div className="absolute top-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             <div className="absolute bottom-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />

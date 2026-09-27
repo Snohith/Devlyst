@@ -1,4 +1,5 @@
 import prettier from "prettier/standalone";
+import type { Plugin } from "prettier";
 import * as parserBabel from "prettier/plugins/babel";
 import * as parserEstree from "prettier/plugins/estree";
 import * as parserHtml from "prettier/plugins/html";
@@ -15,10 +16,16 @@ export type SupportedLanguage =
     | "markdown"
     | "yaml";
 
-const PARSERS: Record<string, any> = {
-    javascript: { parser: "babel", plugins: [parserBabel, parserEstree] },
-    typescript: { parser: "typescript", plugins: [parserBabel, parserEstree] },
-    json: { parser: "json", plugins: [parserBabel, parserEstree] },
+type ParserConfig = { parser: string; plugins: Plugin[] };
+
+// Prettier needs estree at runtime to print JavaScript, but the package
+// ships empty type declarations, so it needs a cast here.
+const estreePlugin = parserEstree as unknown as Plugin;
+
+const PARSERS: Record<string, ParserConfig> = {
+    javascript: { parser: "babel", plugins: [parserBabel, estreePlugin] },
+    typescript: { parser: "typescript", plugins: [parserBabel, estreePlugin] },
+    json: { parser: "json", plugins: [parserBabel, estreePlugin] },
     html: { parser: "html", plugins: [parserHtml] },
     css: { parser: "css", plugins: [parserPostcss] },
     markdown: { parser: "markdown", plugins: [parserMarkdown] },
@@ -28,22 +35,22 @@ const PARSERS: Record<string, any> = {
 export async function formatCode(code: string, language: string): Promise<string> {
     const config = PARSERS[language];
 
+    // Only a handful of languages ship a Prettier parser; the rest are left alone.
     if (!config) {
-        console.warn(`[Formatter] Language '${language}' not supported for formatting.`);
+        console.warn(`No formatter available for ${language}.`);
         return code;
     }
 
     try {
-        const formatted = await prettier.format(code, {
+        return await prettier.format(code, {
             parser: config.parser,
             plugins: config.plugins,
             singleQuote: false,
             tabWidth: 4,
             printWidth: 100,
         });
-        return formatted;
     } catch (error) {
-        console.error("[Formatter] Failed to format code:", error);
-        return code; // Return original code on error
+        console.error("Formatting failed:", error);
+        return code;
     }
 }

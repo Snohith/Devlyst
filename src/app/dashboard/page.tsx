@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -8,37 +8,47 @@ import { Plus, ArrowRight, Hash, Settings } from "lucide-react";
 import UserSettings from "@/components/UserSettings";
 import { AuthIdentitySync } from "@/components/AuthIdentitySync";
 
+const USERNAME_STORAGE_KEY = "devlyst-username";
+
+function subscribeToStorage(onChange: () => void) {
+    window.addEventListener("storage", onChange);
+    return () => window.removeEventListener("storage", onChange);
+}
+
+function readStoredUserName() {
+    return window.localStorage.getItem(USERNAME_STORAGE_KEY) ?? "Anonymous";
+}
+
+/** Five digit room code, the same shape the collaboration server expects. */
+function randomRoomCode() {
+    return Math.floor(10000 + Math.random() * 90000).toString();
+}
+
 export default function Dashboard() {
     const router = useRouter();
     const [joinRoomId, setJoinRoomId] = useState("");
     const [isSettingsOpen, setSettingsOpen] = useState(false);
-    const [userName, setUserName] = useState("Anonymous");
+    const storedUserName = useSyncExternalStore(subscribeToStorage, readStoredUserName, () => "Anonymous");
+    const [userName, setUserName] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const stored = localStorage.getItem("devlyst-username");
-            if (stored) setUserName(stored);
-        }
-    }, []);
+    const displayName = userName ?? storedUserName;
 
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
-        const id = joinRoomId.trim();
-        // Allow ONLY 5 digit numbers
-        if (id.length === 5 && !isNaN(Number(id))) {
-            router.push(`/room/${id}`);
-        } else {
-            // Optional: visual feedback could be added here, but for now we rely on HTML5 validation
-            // or simply existing behavior
+        const roomCode = joinRoomId.trim();
+
+        if (/^\d{5}$/.test(roomCode)) {
+            router.push(`/room/${roomCode}`);
         }
     };
 
-    // Helper to generate 5 digit room ID
-    const generateRoomId = () => Math.floor(10000 + Math.random() * 90000).toString();
+    const handleSaveName = (newName: string) => {
+        window.localStorage.setItem(USERNAME_STORAGE_KEY, newName);
+        setUserName(newName);
+    };
 
     return (
         <div className="min-h-screen bg-black text-white font-sans selection:bg-violet-500/30">
-            {/* Conditionally Sync Auth Identity if keys exist */}
             {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && (
                 <AuthIdentitySync onUserSync={setUserName} />
             )}
@@ -65,7 +75,7 @@ export default function Dashboard() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <div>
                         <h1 className="text-4xl font-bold mb-2">Dashboard</h1>
-                        <p className="text-zinc-400">Welcome back, <span className="text-white font-medium">{userName}</span></p>
+                        <p className="text-zinc-400">Welcome back, <span className="text-white font-medium">{displayName}</span></p>
                     </div>
                 </div>
 
@@ -78,7 +88,7 @@ export default function Dashboard() {
                         <h2 className="text-xl font-bold mb-2">Create New Room</h2>
                         <p className="text-zinc-400 mb-6 text-sm">Start a fresh collaboration session instantly.</p>
                         <button
-                            onClick={() => router.push(`/room/${generateRoomId()}`)}
+                            onClick={() => router.push(`/room/${randomRoomCode()}`)}
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-colors w-full sm:w-auto cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
@@ -102,9 +112,7 @@ export default function Dashboard() {
                                 placeholder="Enter 5-digit ID..."
                                 value={joinRoomId}
                                 onChange={(e) => {
-                                    // Only allow numbers
-                                    const val = e.target.value.replace(/\D/g, '');
-                                    if (val.length <= 5) setJoinRoomId(val);
+                                    setJoinRoomId(e.target.value.replace(/\D/g, "").slice(0, 5));
                                 }}
                                 className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 transition-colors placeholder:text-zinc-600 font-mono"
                             />
@@ -120,15 +128,13 @@ export default function Dashboard() {
                 </div>
             </main>
 
-            <UserSettings
-                isOpen={isSettingsOpen}
-                onClose={() => setSettingsOpen(false)}
-                currentName={userName}
-                onSave={(newName) => {
-                    setUserName(newName);
-                    localStorage.setItem("devlyst-username", newName);
-                }}
-            />
+            {isSettingsOpen && (
+                <UserSettings
+                    currentName={displayName}
+                    onClose={() => setSettingsOpen(false)}
+                    onSave={handleSaveName}
+                />
+            )}
         </div>
     );
 }

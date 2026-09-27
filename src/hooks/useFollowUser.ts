@@ -1,8 +1,9 @@
 import { useEffect } from "react";
+import type { editor as MonacoEditor } from "monaco-editor";
 import { WebsocketProvider } from "y-websocket";
 
 export function useFollowUser(
-    editor: any,
+    editor: MonacoEditor.IStandaloneCodeEditor | null,
     provider: WebsocketProvider | null,
     followUserId: number | null
 ) {
@@ -10,17 +11,17 @@ export function useFollowUser(
         if (!editor || !provider || !followUserId) return;
 
         const onChange = () => {
-            const state = provider.awareness.getStates().get(followUserId) as { cursorLocation?: { lineNumber: number; column: number } } | undefined;
-            if (state && state.cursorLocation) {
-                editor.revealPositionInCenterSmooth({
-                    lineNumber: state.cursorLocation.lineNumber,
-                    column: state.cursorLocation.column
-                });
+            const state = provider.awareness.getStates().get(followUserId) as
+                | { cursorLocation?: { lineNumber: number; column: number } }
+                | undefined;
+
+            if (state?.cursorLocation) {
+                editor.revealPositionInCenter(state.cursorLocation);
             }
         };
 
         provider.awareness.on('change', onChange);
-        onChange(); // Initial jump
+        onChange();
 
         return () => {
             provider.awareness.off('change', onChange);

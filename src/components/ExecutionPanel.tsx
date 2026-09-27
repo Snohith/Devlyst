@@ -5,7 +5,6 @@ import { Play, Terminal, XCircle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ExecutionPanelProps {
-    code?: string;
     onRun: () => Promise<void>;
     isRunning: boolean;
     output: string | null;

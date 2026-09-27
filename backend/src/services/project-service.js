@@ -1,17 +1,10 @@
 import {
   DEFAULT_FILE_CONTENT,
   DEFAULT_FILE_NAME,
-  EXTENSION_TO_LANGUAGE,
 } from "../../../shared/constants/languages.js";
 import { AuthorizationError, ConflictError, NotFoundError } from "../errors/app-error.js";
-import { fileRepository } from "../repositories/file-repository.js";
 import { projectRepository } from "../repositories/project-repository.js";
 import { createRoomCode } from "../utils/room-code.js";
-
-function languageFromFileName(name, fallback = "javascript") {
-  const extension = name.split(".").pop()?.toLowerCase();
-  return EXTENSION_TO_LANGUAGE[extension] || fallback;
-}
 
 export function serializeFile(file) {
   return {

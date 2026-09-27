@@ -4,7 +4,6 @@ import helmet from "helmet";
 import { env } from "./config/env.js";
 import { errorHandler, notFound } from "./middleware/error-handler.js";
 import { requestLogger } from "./middleware/request-logger.js";
-import { internalRouter } from "./routes/internal.js";
 import { executionRouter } from "./routes/executions.js";
 import { healthRouter } from "./routes/health.js";
 import { projectRouter } from "./routes/projects.js";
@@ -31,7 +30,6 @@ export function createApp() {
   app.use("/api/health", healthRouter);
   app.use("/api/users", userRouter);
   app.use("/api/projects", projectRouter);
-  app.use("/api/internal", internalRouter);
   app.use("/api/executions", executionRouter);
 
   app.use(notFound);

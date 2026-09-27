@@ -1,13 +1,8 @@
 require('dotenv').config();
-console.log('[Debug] Loaded Env Vars:', {
-    PORT: process.env.PORT,
-    YPERSISTENCE: process.env.YPERSISTENCE,
-    WS_PORT: process.env.NEXT_PUBLIC_WS_PORT
-});
 const WebSocket = require('ws');
 const http = require('http');
 
-// Hardened Origin Check
+// Origins allowed to open a WebSocket to this server.
 const ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
@@ -19,20 +14,15 @@ const wss = new WebSocket.Server({
     noServer: true,
     verifyClient: (info, cb) => {
         const origin = info.origin;
-        // Security: Allow if specifically listed OR if no origin (local tools/scripts)
+        // Requests without an origin (curl, server-side tools) are allowed.
         const isAllowed = !origin || ALLOWED_ORIGINS.includes(origin);
 
-        if (isAllowed) {
-            cb(true);
-        } else {
+        if (!isAllowed) {
             console.warn(`[Security] Blocked connection from unauthorized origin: ${origin}`);
-            // Strict mode: Block if not allowed (Uncomment the line below for strict production security)
-            // cb(false, 403, 'Forbidden');
-
-            // For now, we continue to allow to prevent downtime during DNS propagation, 
-            // but log the warning.
-            cb(true);
         }
+        // Unknown origins are still let through so an unlisted production
+        // domain cannot take the editor down.
+        cb(true);
     }
 });
 
@@ -42,21 +32,19 @@ const port = process.env.PORT || 1234;
 
 const server = http.createServer((request, response) => {
     response.writeHead(200, { 'Content-Type': 'text/plain' });
-    response.end('Yjs WebSocket Server (Secure & Optimized)');
+    response.end('Yjs WebSocket server');
 });
 
 wss.on('connection', (ws, req) => {
-    // Standard Yjs setup
     setupWSConnection(ws, req);
 
-    // Heartbeat
+    // Heartbeat so dead connections can be dropped.
     ws.isAlive = true;
     ws.on('pong', () => {
         ws.isAlive = true;
     });
 });
 
-// Interval to clean up dead connections (Optimization)
 const interval = setInterval(() => {
     wss.clients.forEach((ws) => {
         if (ws.isAlive === false) return ws.terminate();
@@ -64,7 +52,7 @@ const interval = setInterval(() => {
         ws.isAlive = false;
         ws.ping();
     });
-}, 15000); // Ping every 15 seconds to detect disconnects faster
+}, 15000);
 
 wss.on('close', () => {
     clearInterval(interval);

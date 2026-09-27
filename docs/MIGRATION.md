@@ -1,31 +1,54 @@
-# Devlyst Migration & Deployment Guide
+# Devlyst Architecture & Deployment Guide
 
-Devlyst has been decomposed from a Next.js monolith into a 3-tier decoupled architecture:
+Devlyst runs as three loosely coupled parts:
 
 ```
-[ Frontend: React + Vite + Tailwind ]
-       │                      │
-  HTTP REST (Clerk Bearer)    │ WebSocket (Yjs + Clerk Token)
-       ▼                      ▼
-[ Backend: Express + Prisma ] ◄─► [ WebSocket: Dedicated Yjs Server ]
+[ Web app: Next.js + React + Tailwind + Monaco ]
+       │                                  │
+  HTTP (route /api/execute → Judge0)     │ WebSocket (Yjs CRDT sync)
+       ▼                                  ▼
+    [ Judge0 ]                    [ WebSocket: server.js ]
+                                         │
+[ Backend: Express + Prisma ] (optional REST API for projects/users)
        │
 [ PostgreSQL Database ]
 ```
+
+The web app and the WebSocket server are the product; the Express backend is
+optional and only needed if you want the projects/users REST API.
 
 ## Running Locally
 
 ### Prerequisites
 - Node.js >= 20
-- PostgreSQL database (or use `docker compose up -d db`)
+- PostgreSQL database, only for the optional backend (or use `docker compose up -d db`)
 
 ### Environment Variables
-Configure your root `.env` or set in each package:
-- `DATABASE_URL`: `postgresql://devlyst:devlyst_dev_password@localhost:5432/devlyst?schema=public`
-- `CLERK_SECRET_KEY`: Your Clerk Secret Key
-- `CLERK_PUBLISHABLE_KEY` (or `VITE_CLERK_PUBLISHABLE_KEY`): Your Clerk Publishable Key
+The web app reads `.env.local` at the repository root (see `.env.example`):
+- `NEXT_PUBLIC_APP_URL`: public url of the app, used for metadata and origin checks
+- `NEXT_PUBLIC_WS_URL` (or `NEXT_PUBLIC_WS_HOST` + `NEXT_PUBLIC_WS_PORT`): where to reach the Yjs server
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY`: Clerk auth keys
 - `JUDGE0_API_URL` (optional): `https://ce.judge0.com` — base url of the Judge0 CE instance used for code execution. Set `JUDGE0_API_KEY` / `JUDGE0_API_HOST` when pointing at a RapidAPI-hosted Judge0 instance.
 
-### 1. Database & Backend
+The backend reads `.env` in the repository root or in `backend/`:
+- `DATABASE_URL`: `postgresql://devlyst:devlyst_dev_password@localhost:5432/devlyst?schema=public`
+- `CLERK_SECRET_KEY`: Your Clerk Secret Key
+- `CLIENT_ORIGINS`: comma-separated origins allowed to call the API (defaults to `http://localhost:3000`)
+
+### 1. WebSocket Server
+```bash
+node server.js
+# Running on ws://localhost:1234
+```
+
+### 2. Web App
+```bash
+npm install
+npm run dev
+# Running on http://localhost:3000
+```
+
+### 3. Backend API (optional)
 ```bash
 cd backend
 npm install
@@ -34,24 +57,8 @@ npm run dev
 # Running on http://localhost:4000
 ```
 
-### 2. WebSocket Server
-```bash
-cd websocket
-npm install
-npm run dev
-# Running on ws://localhost:1234
-```
-
-### 3. Frontend Client
-```bash
-cd frontend
-npm install
-npm run dev
-# Running on http://localhost:5173
-```
-
 ### Docker Compose
-Run the entire stack with Docker:
+Run the web app, the WebSocket server, the backend and PostgreSQL with Docker:
 ```bash
 docker compose up --build
 ```

@@ -13,7 +13,6 @@ export default function Error({
     reset: () => void;
 }) {
     useEffect(() => {
-        // Log the error to an error reporting service
         console.error('Application Error:', error);
     }, [error]);
 
@@ -35,7 +34,7 @@ export default function Error({
 
                     <h2 className="text-2xl font-bold text-white mb-2">Something went wrong!</h2>
                     <p className="text-zinc-400 mb-8 text-sm">
-                        We encountered an unexpected error. Our team has been notified.
+                        We encountered an unexpected error.
                         <br />
                         <span className="font-mono text-zinc-600 text-xs mt-2 block">{error.digest}</span>
                     </p>

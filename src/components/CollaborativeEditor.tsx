@@ -5,40 +5,33 @@ import Editor, { OnMount } from "@monaco-editor/react";
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
 import { MonacoBinding } from "y-monaco";
+import { initVimMode } from "monaco-vim";
 import { cn } from "@/lib/utils";
+import type { Collaborator, MonacoApi, MonacoEditor } from "@/lib/collaboration";
 import { useCursorBroadcasting } from "@/hooks/useCursorBroadcasting";
 import { useFollowUser } from "@/hooks/useFollowUser";
 
-// Random color generator for cursors
+// Color palette for remote cursors and selection highlights.
 const USER_COLORS = [
     "#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc", "#f472b6",
 ];
 
 interface CollaborativeEditorProps {
-    roomId: string;
     className?: string;
     defaultValue?: string;
-    onEditorMount?: (editor: any, monaco: any) => void;
-    onAwarenessChange?: (users: any[]) => void;
+    onEditorMount?: (editor: MonacoEditor, monaco: MonacoApi) => void;
+    onAwarenessChange?: (users: Collaborator[]) => void;
     language?: string;
     onLanguageChange?: (lang: string) => void;
     followUserId?: number | null;
-    isVimMode?: boolean; // New prop
+    isVimMode?: boolean;
     doc: Y.Doc | null;
     provider: WebsocketProvider | null;
     filename: string;
     userName: string;
 }
 
-// Import monaco-vim dynamically or just verify it works with SSR false (Client Header is present so standard import usually OK, but require() inside effect is safer for some libs). 
-// Actually standard import `import { initVimMode } from 'monaco-vim'` works if the component is client-side only.
-// But `monaco-vim` might depend on `window`. Let's use `require` inside the effect or dynamic import.
-import { initVimMode } from "monaco-vim";
-
-export type MonacoEditor = Parameters<OnMount>[0];
-
 export default function CollaborativeEditor({
-    roomId,
     className,
     defaultValue = "// Start coding together...",
     onEditorMount,
@@ -53,13 +46,13 @@ export default function CollaborativeEditor({
     userName
 }: CollaborativeEditorProps) {
     const [editorRef, setEditorRef] = useState<MonacoEditor | null>(null);
-    const [monacoRef, setMonacoRef] = useState<Parameters<OnMount>[1] | null>(null);
+    const [monacoRef, setMonacoRef] = useState<MonacoApi | null>(null);
     const [yMap, setYMap] = useState<Y.Map<unknown> | null>(null);
 
-    const vimModeRef = useRef<any>(null);
+    const vimModeRef = useRef<ReturnType<typeof initVimMode> | null>(null);
     const statusNodeRef = useRef<HTMLDivElement>(null);
 
-    // Stable User Identity (Color persists, name updates)
+    // The cursor color is picked once per session; the name can change any time.
     const [color] = useState(() => USER_COLORS[Math.floor(Math.random() * USER_COLORS.length)]);
 
     const user = useMemo(() => ({
@@ -67,17 +60,15 @@ export default function CollaborativeEditor({
         color
     }), [userName, color]);
 
-    // Handle typing events
+    // Flag the user as typing for a moment after each keystroke.
     useEffect(() => {
         if (!provider || !editorRef) return;
 
         let typingTimeout: NodeJS.Timeout;
 
         const handleContentChange = () => {
-            // Set local state to typing
             provider.awareness.setLocalStateField('isTyping', true);
 
-            // Clear typing status after 1s of inactivity
             clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => {
                 provider.awareness.setLocalStateField('isTyping', false);
@@ -98,23 +89,20 @@ export default function CollaborativeEditor({
         if (onEditorMount) onEditorMount(editor, monaco);
     };
 
-    // Use Custom Hooks
     useCursorBroadcasting(editorRef, provider, user);
     useFollowUser(editorRef, provider, followUserId);
 
-    // Vim Mode Effect
+    // Install the vim bindings when the mode turns on and remove them when it turns off.
     useEffect(() => {
         if (!editorRef || !statusNodeRef.current) return;
 
         if (isVimMode) {
             if (!vimModeRef.current) {
-                // Attach Vim Mode
                 const vim = initVimMode(editorRef, statusNodeRef.current);
                 vimModeRef.current = vim;
             }
         } else {
             if (vimModeRef.current) {
-                // Detach Vim Mode
                 vimModeRef.current.dispose();
                 vimModeRef.current = null;
             }
@@ -133,7 +121,7 @@ export default function CollaborativeEditor({
         if (editorRef && monacoRef && language) {
             const model = editorRef.getModel();
             if (model) {
-                monacoRef.editor.setModelLanguage(model, language); // Safely update language
+                monacoRef.editor.setModelLanguage(model, language);
             }
         }
     }, [language, editorRef, monacoRef]);
@@ -146,27 +134,24 @@ export default function CollaborativeEditor({
         }
     }, [language, yMap]);
 
-    // Setup Config Map & Awareness Listeners (Styles)
+    // Keep the shared language and the remote cursor styling in sync.
     useEffect(() => {
         if (!provider || !doc) return;
 
         const configMap = doc.getMap("config");
-        setTimeout(() => setYMap(configMap), 0);
+        setYMap(configMap);
 
         const handleConfigChange = () => {
             const newLang = configMap.get("language");
-            if (newLang && typeof newLang === 'string' && onLanguageChange) {
-                onLanguageChange(newLang);
+            if (typeof newLang === "string") {
+                onLanguageChange?.(newLang);
             }
         };
 
         configMap.observe(handleConfigChange);
         handleConfigChange();
 
-        // Cursor Styling (Moved to a separate helper function to keep effect clean)
-        const updateCursorStyles = (states: any[]) => {
-            // ... (CSS generation logic could be moved to util, but keeping inline for now is okay if component is smaller)
-            // For brevity, using the same logic but condensed or strictly necessary parts
+        const updateCursorStyles = (states: Collaborator[]) => {
             const styleId = "yjs-cursor-styles";
             let styleElement = document.getElementById(styleId);
             if (!styleElement) {
@@ -176,32 +161,35 @@ export default function CollaborativeEditor({
             }
 
             let css = "";
-            states.forEach(state => {
-                if (state.user && state.user.color) {
-                    const { color, name } = state.user;
-                    const clientID = state.clientID;
-                    css += `
-                        .yRemoteSelection-${clientID} { background-color: ${color}; opacity: 0.2; }
-                        .yRemoteSelectionHead-${clientID} {
-                            position: absolute; border-left: ${color} solid 2px;
-                            border-top: ${color} solid 2px; border-bottom: ${color} solid 2px;
-                            height: 100%; box-sizing: border-box;
-                        }
-                        .yRemoteSelectionHead-${clientID}::after {
-                            position: absolute; content: "${name}"; top: -1.8em; left: -2px;
-                            font-size: 0.7rem; font-weight: bold; background-color: ${color};
-                            color: #000; padding: 2px 6px; border-radius: 4px; border-bottom-left-radius: 0;
-                            white-space: nowrap; pointer-events: none; z-index: 10;
-                        }
-                    `;
-                }
+            states.forEach((state) => {
+                if (!state.user?.color) return;
+
+                const { color, name } = state.user;
+                const clientID = state.clientID;
+                css += `
+                    .yRemoteSelection-${clientID} { background-color: ${color}; opacity: 0.2; }
+                    .yRemoteSelectionHead-${clientID} {
+                        position: absolute; border-left: ${color} solid 2px;
+                        border-top: ${color} solid 2px; border-bottom: ${color} solid 2px;
+                        height: 100%; box-sizing: border-box;
+                    }
+                    .yRemoteSelectionHead-${clientID}::after {
+                        position: absolute; content: "${name}"; top: -1.8em; left: -2px;
+                        font-size: 0.7rem; font-weight: bold; background-color: ${color};
+                        color: #000; padding: 2px 6px; border-radius: 4px; border-bottom-left-radius: 0;
+                        white-space: nowrap; pointer-events: none; z-index: 10;
+                    }
+                `;
             });
+
             styleElement.innerHTML = css;
         };
 
         const onAwarenessUpdate = () => {
-            const states = Array.from(provider.awareness.getStates().entries()).map(([key, value]) => ({ clientID: key, ...value }));
-            if (onAwarenessChange) onAwarenessChange(Array.from(provider.awareness.getStates().values()));
+            const states = Array.from(provider.awareness.getStates().entries())
+                .map(([clientID, state]) => ({ clientID, ...(state as Omit<Collaborator, "clientID">) }));
+
+            onAwarenessChange?.(states);
             updateCursorStyles(states);
         };
 
@@ -211,22 +199,21 @@ export default function CollaborativeEditor({
         return () => {
             configMap.unobserve(handleConfigChange);
             provider.awareness.off('change', onAwarenessUpdate);
-            // Ideally reject style tag only if no other editors are present, but here it's fine
         };
-    }, [provider, doc]); // Removed onLanguageChange from dep
+    }, [provider, doc, onAwarenessChange, onLanguageChange]);
 
-    // File Binding Logic (Critical for Memory Leaks)
+    // Bind the active file to its shared Y.Text.
     const bindingRef = React.useRef<MonacoBinding | null>(null);
 
-    // Wait for provider sync to avoid overwriting existing files
+    // The binding may only be created once the provider finished its first sync,
+    // otherwise a fresh client would seed the document and wipe existing files.
     const [isSynced, setIsSynced] = useState(false);
 
     useEffect(() => {
         if (!provider) return;
 
-        // Check if already synced
         if (provider.shouldConnect && provider.wsconnected && provider.synced) {
-            setTimeout(() => setIsSynced(true), 0);
+            setIsSynced(true);
         }
 
         const onSync = (isSynced: boolean) => {
@@ -239,13 +226,12 @@ export default function CollaborativeEditor({
         };
     }, [provider]);
 
-    // We use a state to force re-binding if the remote yText instance changes
+    // Bumping this forces a re-bind when the remote replaced the Y.Text instance.
     const [bindingVersion, setBindingVersion] = useState(0);
 
     useEffect(() => {
         if (!editorRef || !provider || !doc || !filename || !isSynced) return;
 
-        // Cleanup previous binding immediately
         if (bindingRef.current) {
             bindingRef.current.destroy();
             bindingRef.current = null;
@@ -253,21 +239,17 @@ export default function CollaborativeEditor({
 
         const filesMap = doc.getMap("files");
 
-        // 1. Ensure file exists (Atomic check-and-set pattern preferred, but Yjs handles LWW)
+        // Seed the file for the first client in the room.
         if (!filesMap.has(filename)) {
             const newFile = new Y.Text();
             newFile.insert(0, defaultValue || "");
             filesMap.set(filename, newFile);
         }
 
-        // 2. Get the current shared type
         const yText = filesMap.get(filename) as Y.Text;
-
         const model = editorRef.getModel();
         if (!model) return;
 
-        // 3. Create Binding
-        // @ts-ignore
         const newBinding = new MonacoBinding(
             yText,
             model,
@@ -277,13 +259,11 @@ export default function CollaborativeEditor({
         bindingRef.current = newBinding;
         editorRef.layout();
 
-        // 4. Critical: Listen for external replacements of this file
         const handleMapChange = () => {
-            const currentYText = filesMap.get(filename) as Y.Text;
-            // If the object reference changed (someone else replaced the file), we must re-bind
-            if (currentYText !== yText) {
-
-                setBindingVersion(v => v + 1);
+            // A different Y.Text object means somebody replaced the file wholesale,
+            // so the existing binding is stale and has to be rebuilt.
+            if (filesMap.get(filename) !== yText) {
+                setBindingVersion((version) => version + 1);
             }
         };
 
@@ -320,8 +300,7 @@ export default function CollaborativeEditor({
                     className="bg-transparent"
                 />
             </div>
-            {/* Vim Status Bar (only shown when Vim is active) */}
-            {/* Vim Status Bar (only shown when Vim is active) */}
+            {/* Only visible while Vim mode is active. */}
             <div
                 ref={statusNodeRef}
                 className={cn(
@@ -330,23 +309,20 @@ export default function CollaborativeEditor({
                 )}
             />
 
-            {/* Typing Indicator Overlay */}
-            <TypingIndicator users={[]} provider={provider} />
+            <TypingIndicator provider={provider} />
         </div>
     );
 }
 
-// Typing Indicator Component
-function TypingIndicator({ users, provider }: { users: any[], provider: WebsocketProvider | null }) {
-    const [typingUsers, setTypingUsers] = useState<any[]>([]);
+function TypingIndicator({ provider }: { provider: WebsocketProvider | null }) {
+    const [typingUsers, setTypingUsers] = useState<Collaborator[]>([]);
 
     useEffect(() => {
         if (!provider) return;
 
         const updateTypingStatus = () => {
-            const states = Array.from(provider.awareness.getStates().values());
-            const typing = states.filter((state: any) => state.isTyping && state.user?.name);
-            setTypingUsers(typing);
+            const states = Array.from(provider.awareness.getStates().values()) as Collaborator[];
+            setTypingUsers(states.filter((state) => state.isTyping && state.user?.name));
         };
 
         provider.awareness.on('change', updateTypingStatus);
@@ -355,23 +331,25 @@ function TypingIndicator({ users, provider }: { users: any[], provider: Websocke
 
     if (typingUsers.length === 0) return null;
 
+    const names = typingUsers.map((state) => state.user?.name ?? "Someone");
+
     return (
         <div className="absolute bottom-8 right-6 z-50 bg-black/80 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-full text-xs text-zinc-400 flex items-center gap-2 shadow-lg animate-in slide-in-from-bottom-2 fade-in duration-200 pointer-events-none">
             <div className="flex -space-x-1.5">
-                {typingUsers.slice(0, 3).map((state: any, i) => (
+                {typingUsers.slice(0, 3).map((state) => (
                     <div
-                        key={i}
+                        key={state.clientID}
                         className="w-2 h-2 rounded-full ring-2 ring-black"
                         style={{ backgroundColor: state.user?.color || '#888' }}
                     />
                 ))}
             </div>
             <span>
-                {typingUsers.length === 1
-                    ? `${typingUsers[0].user.name} is typing...`
-                    : typingUsers.length === 2
-                        ? `${typingUsers[0].user.name} and ${typingUsers[1].user.name} are typing...`
-                        : `${typingUsers[0].user.name} and ${typingUsers.length - 1} others are typing...`
+                {names.length === 1
+                    ? `${names[0]} is typing...`
+                    : names.length === 2
+                        ? `${names[0]} and ${names[1]} are typing...`
+                        : `${names[0]} and ${names.length - 1} others are typing...`
                 }
             </span>
         </div>

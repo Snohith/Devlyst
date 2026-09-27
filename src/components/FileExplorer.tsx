@@ -9,14 +9,13 @@ import { saveAs } from "file-saver";
 
 interface FileExplorerProps {
     doc: Y.Doc | null;
-    provider: any; // Using any for WebsocketProvider to avoid heavy import dependencies if not needed
     currentFile: string;
     onFileSelect: (filename: string) => void;
     isOpen?: boolean;
     onClose?: () => void;
 }
 
-export default function FileExplorer({ doc, provider, currentFile, onFileSelect, isOpen, onClose }: FileExplorerProps) {
+export default function FileExplorer({ doc, currentFile, onFileSelect, isOpen, onClose }: FileExplorerProps) {
     const [files, setFiles] = useState<string[]>([]);
     const [newFileName, setNewFileName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
@@ -32,7 +31,8 @@ export default function FileExplorer({ doc, provider, currentFile, onFileSelect,
         };
 
         filesMap.observe(updateFiles);
-        updateFiles(); // Initial
+        // Read the current files now; observe() only fires on later changes.
+        updateFiles();
 
         // Ensure main.js exists
         if (!filesMap.has("main.js")) {

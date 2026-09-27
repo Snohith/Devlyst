@@ -4,14 +4,20 @@ import { useState, useEffect } from "react";
 import { Download, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Chromium-only event that lets a site trigger the native install flow.
+interface InstallPromptEvent extends Event {
+    prompt: () => Promise<void>;
+    userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 export function InstallPrompt() {
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+    const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
     const [showPrompt, setShowPrompt] = useState(false);
 
     useEffect(() => {
-        const handler = (e: Event) => {
-            e.preventDefault();
-            setDeferredPrompt(e);
+        const handler = (event: Event) => {
+            event.preventDefault();
+            setDeferredPrompt(event as InstallPromptEvent);
             setShowPrompt(true);
         };
 
@@ -22,7 +28,7 @@ export function InstallPrompt() {
     const handleInstall = async () => {
         if (!deferredPrompt) return;
 
-        deferredPrompt.prompt();
+        await deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
 
         if (outcome === 'accepted') {

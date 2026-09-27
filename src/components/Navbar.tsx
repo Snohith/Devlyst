@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
+// Clerk's auth widgets only exist in the browser, so the server pass renders a
+// placeholder and the client swaps in the real button after hydration.
+const subscribeToNothing = () => () => {};
+
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const [mounted, setMounted] = useState(false);
-
-    // Standard mounted check pattern
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const mounted = useSyncExternalStore(subscribeToNothing, () => true, () => false);
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-black/50 backdrop-blur-md border-b border-white/5">

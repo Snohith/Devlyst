@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  DEFAULT_FILE_CONTENT,
-  DEFAULT_FILE_NAME,
   EXECUTABLE_LANGUAGES,
   EXTENSION_TO_LANGUAGE,
   JUDGE0_LANGUAGES,

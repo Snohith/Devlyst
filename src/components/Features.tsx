@@ -1,16 +1,6 @@
-import { cn } from "@/lib/utils";
 import React from "react";
 import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
-import {
-    IconArrowWaveRightUp,
-    IconBoxAlignRightFilled,
-    IconBoxAlignTopLeft,
-    IconClipboardCopy,
-    IconFileBroken,
-    IconSignature,
-    IconTableColumn,
-} from "@tabler/icons-react";
-import { Code2, Users, Zap, Lock, Globe, Terminal } from "lucide-react";
+import { Code2, Users, Zap, Lock, Globe } from "lucide-react";
 
 export function Features() {
     return (
@@ -28,10 +18,6 @@ export function Features() {
         </BentoGrid>
     );
 }
-const Skeleton = () => (
-    <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-neutral-900 to-neutral-800 border border-white/5" />
-);
-
 const CollaborationHeader = () => (
     <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-violet-900/20 to-indigo-900/20 border border-white/5 relative overflow-hidden flex flex-col items-center justify-center group">
         <div className="absolute inset-0 bg-dot-white/[0.2] [mask-image:radial-gradient(ellipse_at_center,white,transparent)]" />
@@ -104,7 +90,7 @@ const SpeedHeader = () => (
 
 const NetworkHeader = () => (
     <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-[#050505] border border-white/5 relative overflow-hidden flex items-center justify-center">
-        {/* World Map Background (simulated with dots or svg) */}
+        {/* World Map Background */}
         <div className="absolute inset-0 bg-[url('/globe.svg')] bg-cover opacity-10" />
 
         {/* Central Hub */}
@@ -118,7 +104,7 @@ const NetworkHeader = () => (
         <div className="absolute w-1.5 h-1.5 bg-violet-400 rounded-full bottom-1/3 right-1/4 animate-ping delay-500" />
         <div className="absolute w-2 h-2 bg-blue-400 rounded-full top-1/2 right-1/3 animate-ping delay-1000" />
 
-        {/* Connecting Lines (simulated) */}
+        {/* Connecting Lines */}
         <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
             <path d="M100 50 Q 150 20 200 60" fill="none" stroke="url(#gradient)" strokeWidth="2" />
             <defs>

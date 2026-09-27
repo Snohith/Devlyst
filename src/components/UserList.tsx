@@ -1,16 +1,9 @@
 import { cn } from "@/lib/utils";
+import type { Collaborator } from "@/lib/collaboration";
 import { Eye } from "lucide-react";
 
-interface User {
-    clientID: number;
-    user: {
-        name: string;
-        color: string;
-    };
-}
-
 interface UserListProps {
-    users: User[];
+    users: Collaborator[];
     onFollow?: (clientId: number) => void;
     followedUserId?: number | null;
 }
@@ -21,14 +14,13 @@ export default function UserList({ users, onFollow, followedUserId }: UserListPr
     return (
         <div className="flex items-center gap-2">
             <div className="flex -space-x-2 overflow-hidden px-2 py-1 items-center hover:space-x-1 transition-all duration-300">
-                {users.map((user, i) => {
+                {users.map((user) => {
                     const isFollowed = followedUserId === user.clientID;
-                    // Ensure name exists
                     const name = user.user?.name || "Anonymous";
                     const initial = name.charAt(0).toUpperCase();
 
                     return (
-                        <div key={user.clientID || i} className="group relative">
+                        <div key={user.clientID} className="group relative">
                             {/* Avatar */}
                             <div
                                 onClick={() => onFollow && onFollow(user.clientID)}
@@ -46,7 +38,7 @@ export default function UserList({ users, onFollow, followedUserId }: UserListPr
                                 )}
                             </div>
 
-                            {/* Tooltip Name Tag (Visible on Hover) */}
+                            {/* Name tooltip (visible on hover) */}
                             <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-zinc-800 text-white text-[10px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-xl border border-white/10">
                                 {name}
                                 {/* Arrow */}

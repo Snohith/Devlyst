@@ -7,27 +7,20 @@ import {
     getJudge0Runtime,
 } from '@/lib/judge0';
 
-// Judge0 submissions (compile + run) can take a few seconds.
+// Compiling and running a submission takes a few seconds.
 export const maxDuration = 30;
 
 const MAX_SOURCE_BYTES = 100_000;
 
 export async function POST(request: Request) {
-    // 1. Validate Origin
     if (!validateOrigin(request)) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // 2. Rate Limit
-    // Use multiple headers to try and find a real IP, but prefer X-Forwarded-For if available.
-    // In a real prod environment (Vercel, AWS), trust the platform's standard headers.
-    let ip = request.headers.get("x-forwarded-for")?.split(',')[0].trim();
-
-    // Fallback for local development or direct access
-    if (!ip) {
-        const realIp = request.headers.get("x-real-ip");
-        ip = realIp || "127.0.0.1";
-    }
+    // Behind a proxy the client address lives in x-forwarded-for; fall back to
+    // x-real-ip and finally loopback so local requests are still counted.
+    const forwarded = request.headers.get("x-forwarded-for")?.split(',')[0].trim();
+    const ip = forwarded || request.headers.get("x-real-ip") || "127.0.0.1";
 
     if (isRateLimited(ip)) {
         return NextResponse.json({ error: "Too Many Requests" }, { status: 429 });
@@ -55,7 +48,7 @@ export async function POST(request: Request) {
         );
     }
 
-    // HTML/CSS are editable in Devlyst but cannot be executed by a judge.
+    // HTML and CSS stay editable in Devlyst, they just cannot be judged.
     if (!getJudge0Runtime(language)) {
         return NextResponse.json(
             {
@@ -67,7 +60,6 @@ export async function POST(request: Request) {
         );
     }
 
-    // 3. Execute through Judge0 (replaces the retired public Piston API).
     try {
         const result = await executeWithJudge0({ code, language, stdin });
 

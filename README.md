@@ -1,25 +1,24 @@
 # 💻 Devlyst
 
-> **Devlyst** is a real-time collaborative coding environment built for speed, aesthetics, and synchronization. It combines the power of the **Monaco Editor** with instant **WebSocket-based CRDT collaboration (Yjs)**, PostgreSQL persistence via Prisma, and cloud code execution.
+> **Devlyst** is a real-time collaborative coding environment built for speed, aesthetics, and synchronization. It combines the power of the **Monaco Editor** with instant **WebSocket-based CRDT collaboration (Yjs)**, and cloud code execution through **Judge0**.
 
 ---
 
 ## 🛠️ Tech Stack & Architecture
 
-- **Frontend**: Vite + React 19 + Tailwind CSS + Monaco Editor + Clerk Auth
-- **Backend API**: Node.js + Express 5 + PostgreSQL (Prisma ORM)
-- **Real-Time Collaboration**: Dedicated WebSocket Server + Yjs CRDTs
-- **Code Execution**: Judge0 Community Edition API via server proxy (`/api/execute`)
+- **Web App**: Next.js 16 (App Router) + React 19 + Tailwind CSS + Monaco Editor + Clerk Auth
+- **Real-Time Collaboration**: Yjs CRDTs synced by a dedicated WebSocket server ([`server.js`](server.js))
+- **Code Execution**: Judge0 Community Edition API through the Next.js route `/api/execute`
+- **Backend API (optional)**: Node.js + Express 5 + PostgreSQL (Prisma ORM) for projects and users ([`backend/`](backend))
 
 See [docs/MIGRATION.md](docs/MIGRATION.md) for detailed architecture and running instructions.
-
 
 ---
 
 ## 🚀 Quick Start & Installation
 
 ### Prerequisites
-- **Node.js**: `v18.0.0` or higher
+- **Node.js**: `v20.0.0` or higher
 - **npm** or **yarn** / **pnpm**
 
 ### 1. Clone the Repository
@@ -39,24 +38,38 @@ Copy the example environment file:
 cp .env.example .env.local
 ```
 
-### 4. Run Development Server
+### 4. Start the WebSocket Server
+Real-time collaboration needs the Yjs server on port 1234:
+```bash
+node server.js
+```
+
+### 5. Run the Development Server
+In a second terminal:
 ```bash
 npm run dev
 ```
+
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
 ## 🐳 Docker Deployment
 
-To build and run Devlyst inside Docker:
+To build and run the web app plus the WebSocket server inside Docker:
 
 ```bash
 # Build the Docker image
 docker build -t devlyst .
 
-# Run the container
-docker run -p 3000:3000 devlyst
+# Run the container (3000 = Next.js, 1234 = WebSocket)
+docker run -p 3000:3000 -p 1234:1234 devlyst
+```
+
+To also run PostgreSQL and the optional Express API, use the compose file instead:
+
+```bash
+docker compose up --build
 ```
 
 ---

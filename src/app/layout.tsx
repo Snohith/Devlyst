@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
+import { ClerkProvider } from "@clerk/nextjs";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import "./globals.css";
-
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,25 +15,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://devlyst-web.onrender.com";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://devlyst-web.onrender.com'),
+  metadataBase: new URL(appUrl),
   title: {
     default: "Devlyst | Real-time Collaborative Code Editor",
     template: "%s | Devlyst"
   },
-  description: "Experience the future of pair programming with Devlyst. Real-time collaboration, AI assistance, and instant execution in a premium secure environment.",
+  description: "Pair programming in the browser: real-time collaborative editing, 12 executable languages and instant results.",
   keywords: ["code editor", "collaboration", "pair programming", "online ide", "typescript", "react", "yjs", "monaco"],
   authors: [{ name: "Devlyst Team" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://devlyst-web.onrender.com",
+    url: appUrl,
     title: "Devlyst | Real-time Collaborative Code Editor",
-    description: "Code together, instantly. Features real-time sync, AI copilot, and multi-language execution.",
+    description: "Code together, instantly. Real-time sync across a shared Monaco editor with multi-language execution.",
     siteName: "Devlyst",
     images: [
       {
-        url: "/logo.svg", // Fallback to logo until a proper OG image is made
+        url: "/logo.svg",
         width: 800,
         height: 600,
         alt: "Devlyst Logo"
@@ -41,44 +45,31 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Devlyst | Real-time Collaborative Code Editor",
-    description: "Code together, instantly. Features real-time sync, AI copilot, and multi-language execution.",
+    description: "Code together, instantly. Real-time sync across a shared Monaco editor with multi-language execution.",
   },
   icons: {
     icon: "/icon.svg",
-    apple: "/apple-touch-icon.png",
+    apple: "/icon.png",
   },
-  manifest: '/manifest.json',
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Devlyst'
+    statusBarStyle: "black-translucent",
+    title: "Devlyst"
   },
   formatDetection: {
     telephone: false
   }
 };
 
-
-
-
-import { ClerkProvider } from "@clerk/nextjs";
-
-if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-  console.error("❌ MISSING CLERK PUBLISHABLE KEY. Please add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env or deployment configuration.");
-}
-import Script from "next/script";
-import { InstallPrompt } from "@/components/InstallPrompt";
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Safety check for Clerk key to prevent build failures
-  // In production build environments (like Render static build), env vars might be missing initially.
-  // We allow the build to proceed, but the app will warn at runtime.
+  // Clerk is optional: builds and self-hosted copies work without keys, the
+  // sign-in buttons are simply replaced by a developer shortcut.
   const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  const isAuthEnabled = !!clerkKey;
 
   const content = (
     <html lang="en">
@@ -93,7 +84,6 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        {/* Plausible Analytics - Privacy-focused, GDPR compliant */}
         {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
           <Script
             strategy="afterInteractive"
@@ -107,7 +97,7 @@ export default function RootLayout({
     </html>
   );
 
-  if (!isAuthEnabled) {
+  if (!clerkKey) {
     return content;
   }
 

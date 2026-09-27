@@ -45,8 +45,6 @@ We have included a `render.yaml` Blueprint offering the easiest deployment.
 *   After deployment, ensure `devlyst-web` has the correct `NEXT_PUBLIC_WS_URL` pointing to your `devlyst-ws` service (e.g., `wss://devlyst-ws.onrender.com`).
 *   **Important**: For `wss` (secure websockets) to work on Render, the URL scheme must be correct. You might need to manually set `NEXT_PUBLIC_WS_URL` in the frontend service dashboard if the auto-linking sets it to `https`.
 
-### Option B: Railway (Alternative)
-
 ### Option B: The VPS Route (Best Performance/Cost - DigitalOcean / Hetzner)
 This gives you a full linux server.
 

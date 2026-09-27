@@ -17,6 +17,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # Express API for projects/users (optional; the Next.js app runs without it).
   backend:
     build:
       context: .
@@ -29,42 +30,29 @@ services:
       NODE_ENV: production
       PORT: 4000
       DATABASE_URL: postgresql://devlyst:devlyst_dev_password@db:5432/devlyst?schema=public
-      CLIENT_URL: http://localhost:5173
-      CLIENT_ORIGINS: http://localhost:5173,http://localhost:3000
-      PISTON_URL: https://emkc.org/api/v2/piston/execute
+      CLIENT_ORIGINS: http://localhost:3000
       CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
-      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
     depends_on:
       db:
         condition: service_healthy
 
-  websocket:
+  # Next.js app + Yjs WebSocket server (see the root Dockerfile).
+  web:
     build:
       context: .
-      dockerfile: websocket/Dockerfile
-    container_name: devlyst-websocket
+    container_name: devlyst-web
     restart: always
     ports:
+      - "3000:3000"
       - "1234:1234"
     environment:
       NODE_ENV: production
-      WS_PORT: 1234
-      WS_HOST: 0.0.0.0
-      API_URL: http://backend:4000
+      PORT: 1234
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_WS_HOST: localhost
+      NEXT_PUBLIC_WS_PORT: 1234
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
       CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
-    depends_on:
-      - backend
-
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    container_name: devlyst-frontend
-    restart: always
-    ports:
-      - "5173:80"
-    depends_on:
-      - backend
 
 volumes:
   postgres_data:

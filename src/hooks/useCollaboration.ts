@@ -1,78 +1,60 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
 
-type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
+export type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
+
+/**
+ * Builds the WebSocket url of the Yjs server.
+ *
+ * NEXT_PUBLIC_WS_URL wins when it is set. Otherwise the url is derived from the
+ * host/port pair so the same build works locally (ws://localhost:1234) and on
+ * Render (wss://devlyst-ws.onrender.com).
+ */
+function resolveSocketUrl() {
+    if (process.env.NEXT_PUBLIC_WS_URL) {
+        return process.env.NEXT_PUBLIC_WS_URL;
+    }
+
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const configuredHost = process.env.NEXT_PUBLIC_WS_HOST;
+    // Render injects the internal service name; the browser needs the public one.
+    const host = configuredHost === "devlyst-ws"
+        ? "devlyst-ws.onrender.com"
+        : configuredHost || window.location.hostname;
+    const port = process.env.NEXT_PUBLIC_WS_PORT;
+    const portSuffix = port && port !== "443" && port !== "80" ? `:${port}` : "";
+
+    return `${protocol}://${host}${portSuffix}`;
+}
 
 export function useCollaboration(roomId: string) {
     const [doc, setDoc] = useState<Y.Doc | null>(null);
     const [provider, setProvider] = useState<WebsocketProvider | null>(null);
-    const [status, setStatus] = useState<ConnectionStatus>("disconnected");
+    const [status, setStatus] = useState<ConnectionStatus>("connecting");
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         if (!roomId || typeof window === "undefined") return;
 
-        // Reset status on room change
-
-        setTimeout(() => setStatus("connecting"), 0);
-
         const ydoc = new Y.Doc();
-        const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+        const socket = new WebsocketProvider(resolveSocketUrl(), roomId, ydoc);
 
-        // ... (truncated for brevity in thought, but must be full content in tool)
-        // Actually I should just use multi_replace for precision.
-
-
-        // If NEXT_PUBLIC_WS_HOST is set to the internal Render service name "devlyst-ws",
-        // automatically append .onrender.com for client-side access.
-        let hostname = process.env.NEXT_PUBLIC_WS_HOST || window.location.hostname;
-        if (hostname === "devlyst-ws") {
-            hostname = "devlyst-ws.onrender.com";
-        }
-        const port = process.env.NEXT_PUBLIC_WS_PORT;
-
-        // If port is present and NON-standard, append it. 
-        // Render/Prod usually uses 443 (implicit), so portSuffix is empty.
-        const portSuffix = (port && port !== "443" && port !== "80") ? `:${port}` : "";
-
-        // Critical Fix: Construct full base URL.
-        // If hostname is "devlyst-ws", valid URL is "wss://devlyst-ws..."
-        const defaultUrl = `${protocol}://${hostname}${portSuffix}`;
-
-        // Ensure we don't have double protocols if env var includes it
-        const wsUrl = process.env.NEXT_PUBLIC_WS_URL || defaultUrl;
-
-        const wsProvider = new WebsocketProvider(
-            wsUrl,
-            roomId,
-            ydoc
-        );
-
-        // Connection Handlers
-        wsProvider.on('status', (event: { status: string }) => {
+        socket.on("status", (event: { status: string }) => {
             setStatus(event.status as ConnectionStatus);
-            if (event.status === 'connected') {
-                setError(null);
-            }
+            if (event.status === "connected") setError(null);
         });
 
-        wsProvider.on('connection-error', (err: unknown) => {
+        socket.on("connection-error", () => {
             setStatus("error");
-            setError(new Error("Connection failed"));
-            console.error("WebSocket connection error:", err);
+            setError(new Error("Could not reach the collaboration server."));
         });
 
-        // Sync state
-        setTimeout(() => {
-            setDoc(ydoc);
-            setProvider(wsProvider);
-        }, 0);
+        setDoc(ydoc);
+        setProvider(socket);
 
         return () => {
-            // Graceful shutdown
-            wsProvider.disconnect();
-            wsProvider.destroy();
+            socket.destroy();
             ydoc.destroy();
         };
     }, [roomId]);

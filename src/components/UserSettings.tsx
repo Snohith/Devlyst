@@ -1,27 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User, Save, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface UserSettingsProps {
-    isOpen: boolean;
     onClose: () => void;
     currentName: string;
     onSave: (newName: string) => void;
 }
 
-export default function UserSettings({ isOpen, onClose, currentName, onSave }: UserSettingsProps) {
+// Rendered only while open, so the field can start from the current name.
+export default function UserSettings({ onClose, currentName, onSave }: UserSettingsProps) {
     const [name, setName] = useState(currentName);
-
-    useEffect(() => {
-        if (isOpen && name !== currentName) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setName(currentName);
-        }
-    }, [currentName, isOpen]);
-
-    if (!isOpen) return null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
