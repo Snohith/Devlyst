@@ -1,0 +1,73 @@
+{
+  "name": "devlyst-web",
+  "version": "0.1.0",
+  "description": "A premium real-time collaborative coding environment with file management, terminal simulation, and a glassmorphic UI.",
+  "keywords": [
+    "collaborative-editor",
+    "real-time",
+    "yjs",
+    "monaco-editor",
+    "nextjs",
+    "react",
+    "websocket",
+    "glassmorphism",
+    "code-editor",
+    "pair-programming"
+  ],
+  "author": "Snohith",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Snohith/Devlyst.git"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^6.36.7",
+    "@monaco-editor/react": "^4.7.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@sentry/nextjs": "^10.34.0",
+    "@tabler/icons-react": "^3.36.1",
+    "bufferutil": "^4.1.0",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
+    "file-saver": "^2.0.5",
+    "framer-motion": "^12.24.7",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.562.0",
+    "mini-svg-data-uri": "^1.4.4",
+    "monaco-vim": "^0.4.4",
+    "next": "16.1.1",
+    "next-pwa": "^5.6.0",
+    "prettier": "^3.7.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
+    "tailwind-merge": "^3.4.0",
+    "utf-8-validate": "^6.0.6",
+    "ws": "^8.19.0",
+    "y-leveldb": "^0.2.0",
+    "y-monaco": "^0.1.6",
+    "y-websocket": "^1.5.4",
+    "yjs": "^13.6.29",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/next": "^8.0.7",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,38 @@
+services:
+  # Frontend Application
+  - type: web
+    name: devlyst-web
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.10.0
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: NEXT_PUBLIC_WS_PORT
+        value: 443
+      - key: NEXT_PUBLIC_WS_HOST
+        fromService:
+          type: web
+          name: devlyst-ws
+          property: host
+
+  # WebSocket Server
+  - type: web
+    name: devlyst-ws
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.10.0
+      - key: PORT
+        value: 1234
+      - key: ALLOWED_ORIGIN_HOST
+        fromService:
+          type: web
+          name: devlyst-web
+          property: host

@@ -1,0 +1,208 @@
+
+> devlyst-web@0.1.0 lint
+> eslint
+
+
+/Users/chiluverusnohith/Desktop/Devlyst/next.config.ts
+  36:17  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/chiluverusnohith/Desktop/Devlyst/public/sw.js
+  1:156   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:209   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:626   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:6943  warning  'e' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:6962  warning  'a' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:6970  warning  'n' is defined but never used                                          @typescript-eslint/no-unused-vars
+
+/Users/chiluverusnohith/Desktop/Devlyst/public/workbox-4754cb34.js
+  1:49     warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:87     warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:211    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:257    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:298    warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:381    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:642    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:813    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:989    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:1093   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:1738   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:2263   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:3058   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:3102   warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:3598   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:3727   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:7052   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:7234   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:7954   warning  'i' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:7962   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:8066   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:8368   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:9440   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:9550   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:9566   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:9627   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:9962   warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:10038  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:10065  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:10081  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:10163  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:10963  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:11007  warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:11122  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:11194  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:11301  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:11382  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:11623  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:11941  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:12060  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:12464  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:12684  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:13012  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:13272  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:13319  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:13367  warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:14423  warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:14555  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:14599  warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:15097  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:15191  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:15404  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:15514  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:16025  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:16057  warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:16165  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:16591  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:16958  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:17076  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:17178  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:17458  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:17719  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:17903  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:19089  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20040  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20129  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20260  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20317  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20514  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20635  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20768  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:20988  warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:21080  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:21657  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:21768  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:21988  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:22227  warning  'e' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:22385  warning  's' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:22450  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:22748  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:22962  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1:23349  warning  't' is defined but never used                                          @typescript-eslint/no-unused-vars
+  1:23479  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/app/dashboard/page.tsx
+  22:17  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/app/dashboard/page.tsx:22:17
+  20 |             // If Clerk is available and loaded, use that name, otherwise fallback to local
+  21 |             if (isLoaded && user) {
+> 22 |                 setUserName(user.fullName || user.firstName || "Anonymous");
+     |                 ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  23 |             } else {
+  24 |                 const stored = localStorage.getItem("devlyst-username");
+  25 |                 if (stored) setUserName(stored);  react-hooks/set-state-in-effect
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/app/room/[roomId]/page.tsx
+    8:34  warning  'Users' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+   47:38  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   48:38  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   55:40  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   82:40  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   82:53  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  156:18  warning  'err' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+  241:8   warning  React Hook useEffect has a missing dependency: 'language'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/AIAssistant.tsx
+  49:18  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/CollaborativeEditor.tsx
+   21:30  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+   21:43  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+   22:33  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+   41:5   warning  'roomId' is defined but never used                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   59:31  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  167:45  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  216:8   warning  React Hook useEffect has missing dependencies: 'onAwarenessChange' and 'onLanguageChange'. Either include them or remove the dependency array. If 'onLanguageChange' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+  270:9   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free                                                                                                                                                        @typescript-eslint/ban-ts-comment
+  340:28  warning  'users' is defined but never used                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  340:56  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  341:52  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  348:50  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+  361:54  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                   @typescript-eslint/no-explicit-any
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/Features.tsx
+   1:10  warning  'cn' is defined but never used                       @typescript-eslint/no-unused-vars
+   5:5   warning  'IconArrowWaveRightUp' is defined but never used     @typescript-eslint/no-unused-vars
+   6:5   warning  'IconBoxAlignRightFilled' is defined but never used  @typescript-eslint/no-unused-vars
+   7:5   warning  'IconBoxAlignTopLeft' is defined but never used      @typescript-eslint/no-unused-vars
+   8:5   warning  'IconClipboardCopy' is defined but never used        @typescript-eslint/no-unused-vars
+   9:5   warning  'IconFileBroken' is defined but never used           @typescript-eslint/no-unused-vars
+  10:5   warning  'IconSignature' is defined but never used            @typescript-eslint/no-unused-vars
+  11:5   warning  'IconTableColumn' is defined but never used          @typescript-eslint/no-unused-vars
+  13:42  warning  'Terminal' is defined but never used                 @typescript-eslint/no-unused-vars
+  31:7   warning  'Skeleton' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/FileExplorer.tsx
+  12:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:45  warning  'provider' is defined but never used      @typescript-eslint/no-unused-vars
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/Footer.tsx
+  5:27  warning  'Linkedin' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/InstallPrompt.tsx
+  8:58  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/Navbar.tsx
+   6:10  warning  'cn' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  16:5   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  18:9   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/Navbar.tsx:18:9
+  16 |     // eslint-disable-next-line react-hooks/set-state-in-effect
+  17 |     useEffect(() => {
+> 18 |         setMounted(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  19 |     }, []);
+  20 |
+  21 |     return (  react-hooks/set-state-in-effect
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/UserSettings.tsx
+   5:10  warning  'cn' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+  22:8   warning  React Hook useEffect has a missing dependency: 'name'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/components/ui/moving-border-input.tsx
+  12:4  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/hooks/useCursorBroadcasting.ts
+  5:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/hooks/useFollowUser.ts
+  5:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/chiluverusnohith/Desktop/Devlyst/src/lib/formatter.ts
+  18:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 136 problems (1 error, 135 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

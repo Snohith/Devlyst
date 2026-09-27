@@ -1,0 +1,55 @@
+{
+    "name": "Devlyst - Collaborative Code Editor",
+    "short_name": "Devlyst",
+    "description": "Real-time collaborative coding with AI assistance and instant execution",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#8b5cf6",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "productivity",
+        "developer tools",
+        "education"
+    ],
+    "shortcuts": [
+        {
+            "name": "New Room",
+            "short_name": "New",
+            "description": "Create a new coding room",
+            "url": "/dashboard",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "Go to dashboard",
+            "url": "/dashboard",
+            "icons": [
+                {
+                    "src": "/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}
