@@ -9,7 +9,6 @@
 - **Web App**: Next.js 16 (App Router) + React 19 + Tailwind CSS + Monaco Editor + Clerk Auth
 - **Real-Time Collaboration**: Yjs CRDTs synced by a dedicated WebSocket server ([`server.js`](server.js))
 - **Code Execution**: Judge0 Community Edition API through the Next.js route `/api/execute`
-- **Backend API (optional)**: Node.js + Express 5 + PostgreSQL (Prisma ORM) for projects and users ([`backend/`](backend))
 
 See [docs/MIGRATION.md](docs/MIGRATION.md) for detailed architecture and running instructions.
 
@@ -51,26 +50,6 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## 🐳 Docker Deployment
-
-To build and run the web app plus the WebSocket server inside Docker:
-
-```bash
-# Build the Docker image
-docker build -t devlyst .
-
-# Run the container (3000 = Next.js, 1234 = WebSocket)
-docker run -p 3000:3000 -p 1234:1234 devlyst
-```
-
-To also run PostgreSQL and the optional Express API, use the compose file instead:
-
-```bash
-docker compose up --build
-```
 
 ---
 
