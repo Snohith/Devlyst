@@ -1,7 +1,7 @@
 {
   "name": "devlyst-web",
   "version": "0.1.0",
-  "description": "A premium real-time collaborative coding environment with file management, terminal simulation, and a glassmorphic UI.",
+  "description": "A real-time collaborative code editor: shared Monaco editing over Yjs, a synced file tree, and multi-language execution through Judge0.",
   "keywords": [
     "collaborative-editor",
     "real-time",
