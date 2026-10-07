@@ -29,7 +29,9 @@ covers only what ships here.
 
 Every room is one Yjs document. `src/hooks/useCollaboration.ts` creates a `Y.Doc`, opens a
 `WebsocketProvider` against the room id from the URL, and hands both to the room page. `server.js`
-only relays updates between sockets in the same room — it never inspects them. Nothing is written to
+only relays updates between sockets in the same room — it never inspects them. It keeps no
+application state of its own: no accounts, no auth checks, no business logic, no records. Nothing
+is written to
 disk, so a room lasts exactly as long as someone is connected to it.
 
 Inside the document there are two kinds of state:
@@ -118,13 +120,11 @@ cleanup call.
 | `ruby` | 72 | Ruby 2.7.0 |
 | `sql` | 82 | SQLite 3.27.2 |
 
-Two mismatches between what can run and what the UI offers, both worth knowing:
+The map holds 12 runtimes and the dropdown offers all 12 for execution, plus HTML and CSS for
+editing only. One mismatch between what can run and what the UI offers is worth knowing:
 
-- **C** is in the map, so `POST /api/execute` with `language: "c"` runs, but
-  `src/components/LanguageSelector.tsx` doesn't list it and the extension map in the room page has no
-  `c` entry, so nobody can pick it from the interface today.
-- **HTML and CSS** are the other way round. They're in the dropdown and the extension map, but not in
-  the Judge0 map, so they're editable and exportable but not runnable. The route answers those with a
+- **HTML and CSS** are editable and exportable but not runnable. They're in the dropdown and the
+  extension map, but not in the Judge0 map, so the route answers those with a
   400 and an error that lists what can run.
 
 Formatting is separate from execution. `src/lib/formatter.ts` wires up Prettier's standalone build
@@ -187,7 +187,7 @@ Judge0's servers, so treat it like pasting code into a third-party site.
 | `src/components/CollaborativeEditor.tsx` | Monaco + Yjs binding, Vim mode, typing indicator |
 | `src/components/FileExplorer.tsx` | Reads/writes the `files` map, ZIP export, delete confirmation |
 | `src/components/ExecutionPanel.tsx` | Collapsible console with the Run button and status line |
-| `src/components/LanguageSelector.tsx` | The dropdown: 11 runnable languages plus HTML and CSS |
+| `src/components/LanguageSelector.tsx` | The dropdown: 12 runnable languages plus HTML and CSS |
 | `src/components/UserList.tsx`, `UserSettings.tsx`, `AuthIdentitySync.tsx` | Presence avatars, name dialog, Clerk → room name sync |
 | `src/hooks/useCollaboration.ts` | Creates the `Y.Doc` and `WebsocketProvider`, reports connection status |
 | `src/hooks/useCursorBroadcasting.ts`, `useFollowUser.ts` | Awareness publishing and viewport following |
@@ -211,7 +211,6 @@ Things that are missing rather than wrong, in rough order of how likely you are 
 - There's no way to pass stdin, so interactive programs get EOF immediately.
 - The rate limiter and the WebSocket origin check are both per-instance and advisory, as described
   above.
-- C can be executed through the API but not chosen in the dropdown.
 
 
 

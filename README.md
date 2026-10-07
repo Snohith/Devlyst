@@ -15,8 +15,9 @@ Two processes and no database:
 ```
 
 - `src/` — the Next.js app: pages, components, hooks, and the one API route.
-- `server.js` — a small WebSocket server (about 70 lines) that relays Yjs updates between everyone
-  in a room.
+- `server.js` — a small Yjs WebSocket relay (about 70 lines) that passes document updates between
+  everyone in a room. It is a protocol relay, not an application backend: no accounts, no auth checks,
+  no business logic, no stored records.
 - `render.yaml` — a Render blueprint that deploys both.
 
 Rooms aren't stored anywhere. A room's document exists in the memory of the WebSocket server for
@@ -30,7 +31,7 @@ room is gone. That's on purpose: it keeps self-hosting down to two processes and
 - **Keep more than one file.** The explorer reads a `files` map in the shared document, so creating
   or deleting a file happens for everyone at once. New rooms start with `main.js`. You can also
   export the whole room as a ZIP.
-- **Switch languages.** The dropdown lists the 11 runnable languages plus HTML and CSS. Switching it
+- **Switch languages.** The dropdown lists the 12 runnable languages plus HTML and CSS. Switching it
   renames the current file to the matching extension, and opening a file whose extension is known
   switches the language back. HTML and CSS are editable and exportable but can't be run.
 - **Run the current file.** The result, exit code and timing show up in the console panel under the

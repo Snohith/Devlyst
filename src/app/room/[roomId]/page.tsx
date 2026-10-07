@@ -18,6 +18,7 @@ const LANGUAGE_EXTENSIONS: Record<string, string> = {
     typescript: "ts",
     python: "py",
     java: "java",
+    c: "c",
     cpp: "cpp",
     csharp: "cs",
     go: "go",
